@@ -1,4 +1,4 @@
-from scraper import main  
+import scraper 
 import find_urls as find
 import open_job_links as open
 import filter_job_posting as filter
@@ -11,3 +11,7 @@ def create_csv():
     pass
 
 main()
+links = find.add_meta_url()
+print(links)
+
+# f.truncate()
