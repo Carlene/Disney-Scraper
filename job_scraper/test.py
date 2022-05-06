@@ -7,5 +7,5 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 
 
-from open_job_links import main
-main()
+from filter_job_posting import main
+print(main("description.txt"))
