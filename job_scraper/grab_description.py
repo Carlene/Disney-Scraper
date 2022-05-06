@@ -1,11 +1,15 @@
+###############################################################
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager
-###############################################################
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
+from webdriver_manager.chrome import ChromeDriverManager
 
+f = open('description.txt') 
+descriptions = f.readlines()
 
-from open_job_links import main
-main()
+for description in descriptions:
+    print(description)
+    print("\n")
+
