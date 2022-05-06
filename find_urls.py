@@ -29,4 +29,3 @@ def add_meta_url(paths):
     return full_links
 
 # print(add_meta_url(check_for_jobs()[1]))
-

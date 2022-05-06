@@ -38,3 +38,6 @@ def main():
     with open('description.txt', 'a+', encoding="utf-8") as f: 
         f.write(innerHTMLpls)
         f.close
+
+if __name__ == "__main__":
+   main()
