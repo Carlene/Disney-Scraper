@@ -1,4 +1,5 @@
-f = open("source_holder.txt") 
+#TODO hide full path name 
+f = open('source_holder.txt') 
 split_up = f.readlines()
 job_url = "/v2/jobs/"
 
