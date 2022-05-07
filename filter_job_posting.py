@@ -34,13 +34,15 @@ end = "Locations"
 
 
 def filter_posting(text):
-    f = open(text)
+    f = open(text, "r+")
     posting = f.readlines()
 
     descriptions = find_description(posting) #string
     responsibilities = find_responsibilities_and_qualifications(posting, beginning, middle) #list
     qualifications = find_responsibilities_and_qualifications(posting, middle, end) #list
 
+    f.seek(0)
+    f.truncate(0)
     f.close()
 
     return descriptions, responsibilities, qualifications

@@ -13,11 +13,11 @@ def launchBrowser():
     driver.get("https://www.metacareers.com/jobs/?q=data")
     return driver
 
-def data_jobs_scraper():
+def scraper():
     driver = launchBrowser()
     continue_link = driver.find_element(By.CLASS_NAME, value='_8tk7') #div class that holds job postings
     innerHTMLpls = continue_link.get_attribute('innerHTML') 
 
     with open('source_holder.txt', 'a+') as f:
         f.write(innerHTMLpls)
-        f.close
+        f.close()
