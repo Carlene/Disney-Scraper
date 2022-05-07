@@ -7,11 +7,13 @@ from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 
 
-def grab_description(posting):
+def find_description(posting):
     """The job description for Meta Jobs is the second item in the posting"""
+    # TODO: OK, the job description is first, second, and a tiny bit of the third items. 
+    # Need to grab [:3], then the first part of third index before </div>
     return posting[2]
 
-def grab_responsibilities_and_qualifications(posting, lookup_start, lookup_end):
+def find_responsibilities_and_qualifications(posting, lookup_start, lookup_end):
     """Used to search for keywords in the body of the rest of the job posting to filter out qualifications vs. requirements"""
     job_details = [posting[4]]
     holder = []
@@ -25,26 +27,20 @@ def grab_responsibilities_and_qualifications(posting, lookup_start, lookup_end):
             holder.append(detail[start_position : end_position])
     return holder
 
-def grab_responsibilities(posting):
-    starting_paragraph = "Responsibilities"
-    ending_paragraph = "Minimum"
-    responsibilities = grab_responsibilities_and_qualifications(posting, starting_paragraph, ending_paragraph)
-    return responsibilities
 
-def grab_qualifications(posting):
-    starting_paragraph = "Minimum"
-    ending_paragraph = "Locations"
-    qualifications = grab_responsibilities_and_qualifications(posting, starting_paragraph, ending_paragraph)
-    return qualifications
+beginning = "Responsibilities"
+middle = "Minimum"
+end = "Locations"
 
-def main(text):
+
+def filter_posting(text):
     f = open(text)
     posting = f.readlines()
 
-    description = grab_description(posting) #string
-    responsibilities = grab_responsibilities(posting) #list
-    qualifications = grab_qualifications(posting) #list
+    descriptions = find_description(posting) #string
+    responsibilities = find_responsibilities_and_qualifications(posting, beginning, middle) #list
+    qualifications = find_responsibilities_and_qualifications(posting, middle, end) #list
 
     f.close()
 
-    return description, responsibilities, qualifications
+    return descriptions, responsibilities, qualifications

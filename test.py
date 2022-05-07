@@ -7,5 +7,11 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 
 
-from filter_job_posting import main
-print(main("description.txt"))
+import scraper 
+import find_urls
+import open_job_links
+import filter_job_posting
+import pandas as pd
+
+descriptions, responsibilities, qualifications = filter_job_posting.filter_posting(open_job_links.description_file)
+print(responsibilities)
