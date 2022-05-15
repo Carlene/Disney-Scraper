@@ -1,4 +1,4 @@
-from scraper import scraper 
+import scraper  
 import find_urls
 import open_job_links
 import filter_job_posting
@@ -18,18 +18,18 @@ def concat_job_details():
 def create_csv():
     pass
 
-f = open('source_holder.txt', "r+") 
-job_data = f.readlines()
-
 
 if __name__ == "__main__":
-    scraper()
-    paths = find_urls.grab_job_paths(job_data)
-    links = find_urls.add_meta_url(paths)
-    print(links)
-    # open_job_links.grab_job_data_from_multiple_links(links)
+    save_file = open('source_holder.txt', "r+") 
+    job_data = scraper.scrape_HTML(scraper.launchBrowser(), save_file)
+    # paths = find_urls.grab_job_paths(job_data)
+    # links = find_urls.add_meta_url(paths)
+    # print(links)
+    # open_job_links.grab_job_data_from_multiple_links(links[:3])
     # descriptions, responsibilities, qualifications = filter_job_posting.filter_posting(open_job_links.description_file)
     # print(descriptions)
-    f.seek(0)
-    f.truncate(0)
-    f.close()
+    # print(responsibilities)
+    # print(qualifications)
+    # job_data.seek(0)
+    # job_data.truncate(0)
+    # job_data.close()
