@@ -11,22 +11,16 @@ from selenium.webdriver.support import expected_conditions as EC
 def launchBrowser():
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
     driver.minimize_window()
-    driver.get("https://careers.crocs.com/careers/default.aspx")
+    driver.get("https://jobs.disneycareers.com/search-jobs/data%20engineer?orgIds=391-28648&kt=1&acm=8221776%2C21579&glat=40.71427&glon=-74.00597")
     return driver
 
-def write_HTML_to_file(HTML, save_file):
-    f = open(save_file, "a+") 
-    f.write(HTML)
-    job_data = f.readlines()
-    return job_data
-    # with open(save_file, 'r+') as f:
-    #     f.write(HTML)
-    #     f.close()
-
-def scrape_HTML(driver, save_file):
+def scrape_HTML():
     driver = launchBrowser()
-    continue_link = driver.find_element(By.CLASS_NAME, value='module_items-container') #div class that holds job postings
-    innerHTMLpls = continue_link.get_attribute('innerHTML') 
-    write_HTML_to_file(innerHTMLpls, save_file)
+    job_list = driver.find_elements(By.TAG_NAME, value='tbody') #div class that holds job postings
+    return job_list
 
-
+def write_HTML_to_file(HTML_job_list):
+    jobs = []
+    for job in HTML_job_list:
+        jobs.append(job.get_attribute('innerHTML'))
+    return jobs
