@@ -18,9 +18,3 @@ def scrape_HTML():
     driver = launchBrowser()
     job_list = driver.find_elements(By.TAG_NAME, value='tbody') #div class that holds job postings
     return job_list
-
-def write_HTML_to_file(HTML_job_list):
-    jobs = []
-    for job in HTML_job_list:
-        jobs.append(job.get_attribute('innerHTML'))
-    return jobs
