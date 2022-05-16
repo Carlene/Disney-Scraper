@@ -3,3 +3,4 @@ file_one.py
 file_two.py
 just_in_case.txt
 old_scraper/
+*.pyc 

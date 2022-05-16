@@ -1,24 +1,26 @@
+####################### Standard Libraries #####################################
+import pandas as pd
+####################### My Libraries #####################################
 from scraper import scrape_HTML
 from clean_jobs import separate
 from clean_jobs import split_and_clean
-import pandas as pd
+from open_multiple_links import add_disney_url
+from open_multiple_links import grab_job_data_from_multiple_links
+############################################################
 
-# Open Chrome, search for "data" on Meta Jobs site
-# Will give list of jobs that each have a different url, so scrape list of urls from this page 
-    # TBA: keep looping until you get 25, default # per page)
-    # TBA: Click next page, scrape next page of urls
-# Open each url, and grab job desc/location/qualifications/responsibilities
-    # TBA: Clean quals/resps more
-# TBA: Put that into a dataframe to eventually create a CSV
-
-def concat_job_details():
-    pass
-
-def create_csv():
-    pass
-
+def create_csv(d):
+    df = pd.DataFrame.from_dict(d, orient="index")
+    # df.to_csv("disney.csv")
+    return df
 
 if __name__ == "__main__":
-    job_data = scrape_HTML()
-    jobs = split_and_clean(job_data)
-    print(separate(jobs))
+    job_elements = scrape_HTML()
+    job_list = split_and_clean(job_elements, "</tr>")
+    job_details_by_id = separate(job_list)[0]
+    paths = separate(job_list)[1]
+    links = add_disney_url(paths)
+    # print(links)
+    print(grab_job_data_from_multiple_links(links))
+    # create_csv(job_details_by_id)
+    # df = create_csv(job_details_by_id)
+    # print(df)
