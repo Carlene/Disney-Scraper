@@ -1,18 +1,3 @@
-from scraper import scrape_HTML
-
-# Jobs come in HTML formatted list
-
-def split_and_clean(HTML, element):
-    """Turns the WebElement into a python list, removes unnecessary white space, and splits up job posting by HTML element (tr)"""
-    jobs = ""
-    for job in HTML:
-        jobs += job.get_attribute('innerHTML')
-
-    clean_jobs = jobs.replace("\n", "")
-    clean_jobs = " ".join(clean_jobs.split())
-    jobs = clean_jobs.split(element)
-    return jobs
-
 # Separating all of the information I need by formatting used in the HTML 
 
 def find_id(job):
@@ -92,20 +77,21 @@ def separate(jobs):
     paths = []
 
     for job in jobs:
-        path = find_path(job)
-        id = find_id(job)
-        title = find_title(job)
-        brand = find_brand(job)
-        locations = find_locations(job)
-        posting_date = find_posting_date(job)
-        job_details["path"] = path
-        job_details["title"] = title
-        job_details["brand"] = brand
-        job_details["locations"] = locations
-        job_details["posting_date"] = posting_date
-        job_details_by_id[id] = job_details
-        job_details = {}
-        paths.append(path)
+        if len(job) > 0:
+            path = find_path(job)
+            id = find_id(job)
+            title = find_title(job)
+            brand = find_brand(job)
+            locations = find_locations(job)
+            posting_date = find_posting_date(job)
+            job_details["path"] = path
+            job_details["title"] = title
+            job_details["brand"] = brand
+            job_details["locations"] = locations
+            job_details["posting_date"] = posting_date
+            job_details_by_id[id] = job_details
+            job_details = {}
+            paths.append(path)
 
     return job_details_by_id, paths
 
