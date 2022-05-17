@@ -1,3 +1,6 @@
+from re import L
+
+
 albums_by_artist = {"Tyler The Creator" : ["Flower Boy", "Igor", "Call Me When You Get Lost"], 
                     "Tame Impala": ["Innervisions"],
                     "SZA": ["CTRL"],
@@ -8,9 +11,21 @@ hotness_by_artist = {"Tyler The Creator": 5,
                     "SZA": 7,
                     "Beyonce": 9}
 
-combined = {}
-for artist in albums_by_artist:
-    if artist in hotness_by_artist:
-        combined[artist] = albums_by_artist[artist]
-        combined[artist].append(hotness_by_artist[artist])
-print(combined)
+def remove_flowers(item):
+    if item.find("Flower") >= 0:
+        i = item.find("Flower")
+        new_item = item.replace(item[i : (i + len("Flower"))], "")
+        return new_item
+    else:
+        return item
+
+no_flowers = {}
+l = []
+for key, value in albums_by_artist.items():
+    for v in value:
+        new_v = remove_flowers(v)
+        l.append(new_v)
+    no_flowers[key] = l 
+    l =[]
+    
+print(no_flowers)

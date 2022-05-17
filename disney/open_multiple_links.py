@@ -24,11 +24,12 @@ def find_job_id_in_url(url):
 
 description_div = "ats-description"
 
-def grab_job_data_from_multiple_links(urls):
+def grab_job_data_from_multiple_links(paths):
     """Creates a mapping of all job details (not separated yet) to job id of posting"""
     description_by_job_id = {}
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
     driver.minimize_window()
+    urls = add_disney_url(paths)
 
     for url in urls:
         job_id = find_job_id_in_url(url)

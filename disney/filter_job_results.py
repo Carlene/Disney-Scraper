@@ -8,6 +8,7 @@ def find_id(job):
     starting_i = job.find(id_start) 
     ending_i = job.find(id_end) 
     id = job[starting_i + len(id_start) : (ending_i- 2)] # subratracing two from ending id to get rid of "> "
+    id = id.replace("\"", "")
     return id
 
 def find_path(job):
@@ -32,39 +33,36 @@ def find_title(job):
     title = job[starting_i + len(title_start) : ending_i]
     return title
 
-#TODO: clean brands (have ">" at the start of location list)
 def find_brand(job):
     """Finds the specific Disney Org that this job posting is under (eg. ESPN, Disney Streaming Services, etc)"""
     brand_start = "job-brand industry"
     brand_end = "</span>"
 
-    starting_i = job.find(brand_start)
-    ending_i = job.find(brand_end, starting_i+1) # to start looking for spans after the brand start
+    starting_i = job.find(brand_start) + 2 # to avoid " and >
+    ending_i = job.find(brand_end, starting_i) # to start looking for spans after the brand start
 
     brand = job[starting_i + len(brand_start) : ending_i]
     return brand
 
-#TODO: clean locations (have some leading and trailing whitespace and ">" at the start of location list) 
 def find_locations(job):
     """Finds location inside job posting. Job locations are formatted as City, State, Country"""
     location_start = "job-location"
     location_end = "</span>"
 
-    starting_i = job.find(location_start)
-    ending_i = job.find(location_end, starting_i+1) # to start looking for spans after the location start
+    starting_i = job.find(location_start) + 2 #to avoid " and >
+    ending_i = job.find(location_end, starting_i) # to start looking for spans after the location start
 
     location = job[starting_i + len(location_start) : ending_i]
 
     locations = location.split("/") #multiple locations in HTML split up by a backslash
     return locations
 
-#TODO: clean dates (">" at the start of location list)
 def find_posting_date(job):
     """Finds the day that this job posting was added to the Disney Jobs site"""
     posting_date_start = "job-date-posted"
     posting_date_end = "</span>"
 
-    starting_i = job.find(posting_date_start)
+    starting_i = job.find(posting_date_start) + 2 #to avoid " and >
     ending_i = job.find(posting_date_end, starting_i+1) # to start looking for spans after the brand start
 
     posting_date = job[starting_i + len(posting_date_start) : ending_i]
@@ -95,3 +93,27 @@ def separate(jobs):
 
     return job_details_by_id, paths
 
+
+def replace_job_summary(job_description):
+    """Removes unecessary start of job description"""
+    look_for = "<h4>"
+
+    starting_i = job_description.find(look_for)
+    ending_i = job_description.find(look_for, starting_i) # to start looking for header tags after the first one
+
+    job_summary = job_description[starting_i + len(look_for) : ending_i]
+
+    job_description_without_summary = job_description.replace(job_summary, "")
+    return job_description_without_summary
+
+#TODO: GET THIS TO REMOVE THE SUMMARY OMG
+def remove_job_summary(description_dict):
+    description_by_job_id = {}
+    descriptions_list = []
+    for id, desc in description_dict.items():
+        for item in desc:
+            desc_no_summary = replace_job_summary(item)
+            descriptions_list.append(desc_no_summary)
+        description_by_job_id[id] = descriptions_list
+        descriptions_list = []
+    return description_by_job_id
