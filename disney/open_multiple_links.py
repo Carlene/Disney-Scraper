@@ -26,7 +26,7 @@ description_div = "ats-description"
 
 def grab_job_data_from_multiple_links(paths):
     """Creates a mapping of all job details (not separated yet) to job id of posting"""
-    description_by_job_id = {}
+    messy_descriptions_by_job_id = {}
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
     driver.minimize_window()
     urls = add_disney_url(paths)
@@ -36,6 +36,6 @@ def grab_job_data_from_multiple_links(paths):
         driver.get(url)
         job_description = driver.find_elements(By.CLASS_NAME, value=description_div)
         desc = split_and_clean(job_description, "<h2>")
-        description_by_job_id[job_id] = desc
+        messy_descriptions_by_job_id[job_id] = desc
     driver.close()
-    return description_by_job_id
+    return messy_descriptions_by_job_id
