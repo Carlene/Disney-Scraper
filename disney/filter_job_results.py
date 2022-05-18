@@ -1,4 +1,6 @@
-# Separating all of the information I need by formatting used in the HTML 
+#######  Functions to filter job details pulled from the main job search page ####### 
+#TODO: Do something if functions don't find anything
+
 
 def find_id(job):
     """Finds the job posting id for reference"""
@@ -68,45 +70,89 @@ def find_posting_date(job):
     posting_date = job[starting_i + len(posting_date_start) : ending_i]
     return posting_date
 
-def separate(jobs):
-    """Separates job postings into necessary fields: job_id, job_path, job location, job title, job brand"""
-    job_details_by_id = {}
-    job_details = {}
-    paths = []
-
-    for job in jobs:
-        if len(job) > 0:
-            path = find_path(job)
-            id = find_id(job)
-            title = find_title(job)
-            brand = find_brand(job)
-            locations = find_locations(job)
-            posting_date = find_posting_date(job)
-            job_details["path"] = path
-            job_details["title"] = title
-            job_details["brand"] = brand
-            job_details["locations"] = locations
-            job_details["posting_date"] = posting_date
-            job_details_by_id[id] = job_details
-            job_details = {}
-            paths.append(path)
-
-    return job_details_by_id, paths
-
+##############  Functions to filter job details from a specific job's page ############## 
 
 def replace_job_summary(job_description):
     """Removes unecessary start of job description"""
     look_for = "<h4>"
 
     starting_i = job_description.find(look_for)
-    ending_i = job_description.find(look_for, starting_i) # to start looking for header tags after the first one
+    ending_i = job_description.find(look_for, starting_i + 1) # to start looking for header tags after the first one
 
     job_summary = job_description[starting_i + len(look_for) : ending_i]
 
     job_description_without_summary = job_description.replace(job_summary, "")
     return job_description_without_summary
 
-#TODO: GET THIS TO REMOVE THE SUMMARY OMG
+
+def remove_disney_company_description(job_description):
+    "Removes tail of job description, which explains about the Disney company"
+    look_for = "<!--<h3>"
+
+    starting_i = job_description.find(look_for)
+
+    if starting_i < 0:
+        return job_description
+    else:
+        ending_i = len(job_description) # disney about lasts to the end of the description
+        about = job_description[starting_i : ending_i]
+        job_description_no_about = job_description.replace(about, "")
+    return job_description_no_about
+
+
+# def find_posting_headers(job_description):
+#     """Finds all headers for different posting needs (responsibilities, qualifications, anything else)"""
+#     heading = "<h4>"
+
+    
+#     starting_i = job_description.find(look_for)
+
+#     if starting_i < 0:
+#         return job_description
+#     else:
+#         ending_i = len(job_description) # disney about lasts to the end of the description
+#         about = job_description[starting_i : ending_i]
+#         job_description_no_about = job_description.replace(about, "")
+#     return job_description_no_about  
+
+
+#TODO: Need to completely rethink these functions, postings don't always use basic and preferred qualifications, 
+# sometimes there's key qualifications. responsibilities will probably do the same thing
+# Can maybe split on header h4, since that's usually a new category
+
+def find_responsibilities(job_description):
+    """ Separates out responsibilities from job posting"""
+    responsibilities_start = "<h4>Responsibilities:</h4>"
+    responsibilities_end = "<h4>Basic Qualifications:</h4>"
+
+    starting_i = job_description.find(responsibilities_start)
+    if starting_i < 0:
+        return job_description
+    else:
+        ending_i = job_description.find(responsibilities_end) # to start looking for header tags after the first one
+        responsibilities = job_description[starting_i:ending_i]
+        return responsibilities
+
+
+
+def find_qualifications(job_description):
+    """ Separates out basic and preferred qualifications from job posting"""
+    basic_start = "<h4>Basic Qualifications:</h4>"
+    basic_end = "<h4>Preferred Qualifications:</h4>"
+    preferred_end = "<h4>Required Education</h4>"
+
+    starting_basic = job_description.find(basic_start)
+    starting_preferred_basic_end = job_description.find(basic_end)
+
+    if (starting_basic < 0) and (starting_preferred_basic_end < 0): 
+        return "not", "found"
+    else:
+        ending_preferred = job_description.find(preferred_end)
+        basic_qualifications = job_description[starting_basic:starting_preferred_basic_end]
+        preferred_qualifications = job_description[starting_preferred_basic_end:ending_preferred]
+        return basic_qualifications, preferred_qualifications
+
+
 def remove_job_summary(description_dict):
     description_by_job_id = {}
     descriptions_list = []
