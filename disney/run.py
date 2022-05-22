@@ -18,4 +18,3 @@ if __name__ == "__main__":
     all_job_details_by_id = organize.map_job_details_with_qualifications(job_list)
     # print(all_job_details_by_id)
     create_csv(all_job_details_by_id)
-    # print(df)
