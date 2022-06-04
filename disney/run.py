@@ -16,5 +16,4 @@ if __name__ == "__main__":
     job_elements = scrape_HTML()
     job_list = split_and_clean(job_elements, "</tr>")
     all_job_details_by_id = organize.map_job_details_with_qualifications(job_list)
-    # print(all_job_details_by_id)
     create_csv(all_job_details_by_id)
