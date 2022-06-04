@@ -51,8 +51,7 @@ def job_qualifications(messy_descriptions_by_job_id):
 
 
 def map_job_details_with_qualifications(list_of_jobs):
-    """Takes two lists of job data (without qualifications) and url of the actual job posting (to grab qualifications) 
-    and combines this data together  
+    """Takes two lists of job data (without qualifications) and url of the actual job posting (to grab qualifications) and combines this data together  
 
     Outputs:
     all_job_details_by_id: a dictionary of all job details per id
