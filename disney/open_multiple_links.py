@@ -5,6 +5,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
+import time
 ####################### My Libraries #####################################
 from clean import split_and_clean
 
@@ -25,7 +26,11 @@ def find_job_id_in_url(url):
 description_div = "ats-description"
 
 def grab_job_data_from_multiple_links(paths):
-    """Creates a mapping of all job details (not separated yet) to job id of posting"""
+    """ 1. Opens a web browser (minimizes the window)
+        2. Opens a specific job link 
+        3. Grabs the HTML text where the job description is held
+        4. Creates a list of details per job 
+        5. Creates a mapping of all job details to job id of posting"""
     messy_descriptions_by_job_id = {}
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
     driver.minimize_window()
@@ -37,5 +42,6 @@ def grab_job_data_from_multiple_links(paths):
         job_description = driver.find_elements(By.CLASS_NAME, value=description_div)
         desc = split_and_clean(job_description, "<h2>")
         messy_descriptions_by_job_id[job_id] = desc
+        time.sleep(3)
     driver.close()
     return messy_descriptions_by_job_id
