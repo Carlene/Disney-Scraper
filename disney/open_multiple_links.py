@@ -45,8 +45,3 @@ def grab_job_data_from_multiple_links(paths):
         time.sleep(3)
     driver.close()
     return messy_descriptions_by_job_id
-
-
-def click_next_page():
-    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
-    driver.minimize_window()

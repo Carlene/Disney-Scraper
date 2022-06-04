@@ -16,5 +16,10 @@ def launchBrowser():
 def scrape_HTML():
     driver = launchBrowser()
     job_list = driver.find_elements(By.TAG_NAME, value='tbody') #div class that holds job postings
-    # driver.close()
     return job_list
+
+def click_next_page():
+    driver = launchBrowser()
+    pages = driver.find_elements(By.TAG_NAME, value='pagination-paging') #div class that holds next page info
+    return pages
+    
