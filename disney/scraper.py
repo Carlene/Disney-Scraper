@@ -10,11 +10,16 @@ from selenium.webdriver.support import expected_conditions as EC
 def launchBrowser():
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
     driver.minimize_window()
-    driver.get("https://jobs.disneycareers.com/search-jobs/data%20engineer?orgIds=391-28648&kt=1&acm=8221776%2C21579&glat=40.71427&glon=-74.00597")
+    driver.get("https://jobs.disneycareers.com/search-jobs/data%20engineer/391-28648/1?glat=40.71427&glon=-74.00597")
     return driver
 
 def scrape_HTML():
     driver = launchBrowser()
     job_list = driver.find_elements(By.TAG_NAME, value='tbody') #div class that holds job postings
-    # driver.close()
     return job_list
+
+def click_next_page():
+    driver = launchBrowser()
+    pages = driver.find_elements(By.TAG_NAME, value='pagination-paging') #div class that holds next page info
+    return pages
+    

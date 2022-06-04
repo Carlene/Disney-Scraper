@@ -1,6 +1,15 @@
 #######  Functions to filter job details pulled from the main job search page ####### 
 #TODO: Do something if functions don't find anything
+#TODO: Can maaaaybe refactor all the find functions into one function that different paramaters are given to, problem is they all have little tiny annoying differences
 
+# def find_in_description(job:str, starting_str:str, ending_str:str):
+#     "Takes in a starting and ending string to look for within a job description, and grabs the part of the description between those strings "
+
+#     starting_i = job.find(starting_str) 
+#     ending_i = job.find(ending_str) 
+#     id = job[starting_i + len(starting_str) : (ending_i- 2)] 
+#     id = id.replace("\"", "")
+#     return id
 
 def find_id(job):
     """Finds the job posting id for reference"""
@@ -94,26 +103,10 @@ def remove_disney_company_description(job_description):
     if starting_i < 0:
         return job_description
     else:
-        ending_i = len(job_description) # disney about lasts to the end of the description
+        ending_i = len(job_description) # disney "about" lasts to the end of the description
         about = job_description[starting_i : ending_i]
         job_description_no_about = job_description.replace(about, "")
     return job_description_no_about
-
-
-# def find_posting_headers(job_description):
-#     """Finds all headers for different posting needs (responsibilities, qualifications, anything else)"""
-#     heading = "<h4>"
-
-    
-#     starting_i = job_description.find(look_for)
-
-#     if starting_i < 0:
-#         return job_description
-#     else:
-#         ending_i = len(job_description) # disney about lasts to the end of the description
-#         about = job_description[starting_i : ending_i]
-#         job_description_no_about = job_description.replace(about, "")
-#     return job_description_no_about  
 
 
 #TODO: Need to completely rethink these functions, postings don't always use basic and preferred qualifications, 
