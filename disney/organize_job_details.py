@@ -1,3 +1,5 @@
+####################### Standard Libraries #####################################
+####################### My Libraries ###########################################
 from open_multiple_links import grab_job_data_from_multiple_links
 import filter_job_results as fjr
 
