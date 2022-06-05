@@ -19,7 +19,10 @@ def launchBrowser():
 
 
 def split_and_clean(list_of_web_elements, HTMLelement):
-    """Goes through a list of lists of WebElements, turns it into a python list of lists, removes unnecessary white space, and splits up the WebElement by a specific HTML element (for job postings, the tag is <tr>)"""
+    """ 1. Goes through a list of lists of WebElements
+        2. Turns it into a python list of lists, removes unnecessary white space
+        3. Splits up the WebElement by a specific HTML element (for job postings, the tag is <tr>)
+        """
     search_page_jobs = ""
     for web_element in list_of_web_elements:
         search_page_jobs += web_element.get_attribute('innerHTML')
@@ -55,4 +58,36 @@ def scrape_every_page(pages, HTMLelement):
         pages -= 1
     return search_page_job_list
 
-    
+
+def add_disney_url(paths):
+    """Concats the start of the url to the list of job paths"""
+    full_links = []
+    url_start = "https://jobs.disneycareers.com"
+    for path in paths:
+        full_links.append(url_start + path)
+    return full_links
+
+
+#TODO: count links and do something if count is off (15 a page)
+description_div = "ats-description"
+
+def grab_job_data_from_multiple_links(paths):
+    """ 1. Opens a web browser (minimizes the window)
+        2. Opens a specific job link 
+        3. Grabs the HTML text where the job description is held
+        4. Creates a list of details per job 
+        5. Creates a mapping of all job details to job id of posting"""
+    messy_descriptions_by_job_id = {}
+    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
+    driver.minimize_window()
+    urls = add_disney_url(paths)
+
+    for url in urls:
+        job_id = url.split("/", )[-1]
+        driver.get(url)
+        driver.implicitly_wait(10)
+        job_description = driver.find_elements(By.CLASS_NAME, value=description_div)
+        desc = split_and_clean(job_description, "<h2>")
+        messy_descriptions_by_job_id[job_id] = desc
+    driver.close()
+    return messy_descriptions_by_job_id
