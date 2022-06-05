@@ -7,6 +7,7 @@ import organize_job_details as organize
 from open_multiple_links import grab_job_data_from_multiple_links
 ############################################################
 
+# TODO: rename variables to better show the difference between details grabbed from the search page vs. the actual job posting
 def create_csv(d):
     df = pd.DataFrame.from_dict(d, orient="index")
     return df.to_csv("disney.csv")
