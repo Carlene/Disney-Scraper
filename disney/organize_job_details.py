@@ -1,6 +1,6 @@
 ####################### Standard Libraries #####################################
 ####################### My Libraries ###########################################
-from open_multiple_links import grab_job_data_from_multiple_links
+from scraper import grab_job_data_from_multiple_links
 import filter_job_results as fjr
 
 def separate_job_posts(list_of_jobs):
