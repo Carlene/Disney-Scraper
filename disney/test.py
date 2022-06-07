@@ -15,6 +15,6 @@ def create_csv(d):
 if __name__ == "__main__":
     pages = 1
     search_page_job_list = scrape_every_page(pages, "</tr>")
-    all_job_details_by_id = map_job_details_with_qualifications(search_page_job_list)
+    all_job_details_by_id = map_job_details_with_qualifications(search_page_job_list, job_id="28818903776")
     create_csv(all_job_details_by_id)
 
