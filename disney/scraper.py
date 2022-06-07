@@ -2,13 +2,10 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
-from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as EC
 ####################### My Libraries ###########################################
 ################################################################################
 
-#TODO create a file that goes through each page of the job search (maybe also shows 100 jobs per page?)
 def launchBrowser():
     options = webdriver.ChromeOptions()
     options.add_experimental_option("detach", True)
@@ -56,6 +53,7 @@ def scrape_every_page(pages, HTMLelement):
         next = driver.find_element(By.LINK_TEXT, value='Next') # text that holds next page info
         driver.execute_script("arguments[0].click();", next) # clicking the next button using javascript
         pages -= 1
+    print(f"Jobs found: {len(search_page_job_list)}")
     return search_page_job_list
 
 
@@ -68,7 +66,7 @@ def add_disney_url(paths):
     return full_links
 
 
-#TODO: count links and do something if count is off (15 a page)
+# TODO: count links and do something if count is off (15 a page)
 description_div = "ats-description"
 
 def grab_job_data_from_multiple_links(paths):
@@ -85,9 +83,9 @@ def grab_job_data_from_multiple_links(paths):
     for url in urls:
         job_id = url.split("/", )[-1]
         driver.get(url)
-        driver.implicitly_wait(10)
+        # driver.implicitly_wait(10) # pls wait until the elements are found ty
         job_description = driver.find_elements(By.CLASS_NAME, value=description_div)
         desc = split_and_clean(job_description, "<h2>")
         messy_descriptions_by_job_id[job_id] = desc
-    driver.close()
+    print(f"Amount of job ids with job details kept: {len(messy_descriptions_by_job_id)}")
     return messy_descriptions_by_job_id
