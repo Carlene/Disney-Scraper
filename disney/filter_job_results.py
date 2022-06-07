@@ -11,15 +11,17 @@
 #     id = id.replace("\"", "")
 #     return id
 
+##############  Functions to filter job details from the main job search page ############## 
+
 def find_id(job):
     """Finds the job posting id for reference"""
-    id_start = "data-job-id="
+    id_start = "data-job-id=\""
     id_end = "<h2>"
 
     starting_i = job.find(id_start) 
     ending_i = job.find(id_end) 
     id = job[starting_i + len(id_start) : (ending_i- 2)] # subratracing two from ending id to get rid of "> "
-    id = id.replace("\"", "")
+    # id = id.replace("\"", "")
     return id
 
 def find_path(job):
