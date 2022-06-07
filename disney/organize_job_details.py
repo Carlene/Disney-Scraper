@@ -51,7 +51,7 @@ def job_qualifications(messy_descriptions_by_job_id):
     return quals_by_job_id
 
 
-def map_job_details_with_qualifications(list_of_jobs):
+def map_job_details_with_qualifications(list_of_jobs, job_id = ""):
     """Takes two lists of job data (without qualifications) and url of the actual job posting (to grab qualifications) and combines this data together  
 
     Outputs:
@@ -62,6 +62,11 @@ def map_job_details_with_qualifications(list_of_jobs):
     list_of_paths = separate_job_posts(list_of_jobs)[1]
     messy_descriptions_by_job_id = grab_job_data_from_multiple_links(list_of_paths)
     quals_by_job_id = job_qualifications(messy_descriptions_by_job_id)
+
+    if job_id != "":
+        all_job_details_by_id[job_id] = job_details_by_id[job_id] | quals_by_job_id[job_id]
+        print(f"All job details after combining: {len(all_job_details_by_id)}")
+        return all_job_details_by_id
 
     for id in job_details_by_id:
         if id in messy_descriptions_by_job_id:

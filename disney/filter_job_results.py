@@ -116,17 +116,21 @@ def remove_disney_company_description(job_description):
 # Can maybe split on header h4, since that's usually a new category
 
 def find_responsibilities(job_description):
-    """ Separates out responsibilities from job posting"""
+    """ Separates out responsibilities from job posting """
     responsibilities_start = "<h4>Responsibilities:</h4>"
     responsibilities_end = "<h4>Basic Qualifications:</h4>"
 
     starting_i = job_description.find(responsibilities_start)
     if starting_i < 0:
-        return job_description
-    else:
-        ending_i = job_description.find(responsibilities_end) # to start looking for header tags after the first one
-        responsibilities = job_description[starting_i:ending_i]
-        return responsibilities
+        responsibilities_start = "<h2>Responsibilities</h2>"
+        responsibilities_end = "<h2>Key Qualifications</h2>"
+        starting_i = job_description.find(responsibilities_start)
+        if starting_i < 0:
+            return job_description
+
+    ending_i = job_description.find(responsibilities_end) # to start looking for header tags after the first one
+    responsibilities = job_description[starting_i:ending_i]
+    return responsibilities
 
 
 
