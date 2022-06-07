@@ -25,7 +25,6 @@ def separate_job_posts(list_of_jobs):
             job_details_by_id[id] = job_details
             job_details = {}
             paths.append(path)
-
     return job_details_by_id, paths
 
 
@@ -67,5 +66,5 @@ def map_job_details_with_qualifications(list_of_jobs):
     for id in job_details_by_id:
         if id in messy_descriptions_by_job_id:
             all_job_details_by_id[id] = job_details_by_id[id] | quals_by_job_id[id]
+    print(f"All job details after combining: {len(all_job_details_by_id)}")
     return all_job_details_by_id
-    # return job_details_by_id, quals_by_job_id
