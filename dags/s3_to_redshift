@@ -4,29 +4,30 @@ tz = pytz.timezone("US/Pacific")
 from datetime import timedelta
 from airflow import DAG, utils
 from airflow.operators.python_operator import PythonOperator
-from airflow.operators.trigger_dagrun import TriggerDagRunOperator
+from airflow.operators.trigger_dagrun import TriggerDagRunOperator # when my scraper DAG works, will trigger afterwards
 ################################# My Libraries #################################
-from disney.run import main
+from disney.aws_info.upload_to_redshift import main
 
 default_args = {
     "start_date": utils.dates.days_ago(7),
     "depends_on_past": False,
     "retries": 3,
     "retry_delay": timedelta(seconds = 20),
-    "schedule_interval": "0 12 * * *",
+    "schedule_interval": "0 12 * * *", 
     "dagrun_timeout": timedelta(minutes = 40)
     }
 
 with DAG(
-    "disney_scraper",
-    tags = ["scraper", "disney"],
+    "add_to_database",
+    tags = ["data", "redshift", "aws"],
     default_args = default_args,
-    description = "Creates a csv in AWS with Disney job data",
+    # schedule_interval = None #uncomment once scraper DAG works
+    description = "Moves CSV data from S3 to Redshift",
     catchup = False 
-    ) as disney_scraper_dag:
+    ) as add_to_database_dag:
 
-    disney_scraper_daily = PythonOperator(
-        task_id = "disney_scraper", # The name of the table where it will post to.
+    add_to_database = PythonOperator(
+        task_id = "add_to_database", # The name of the table where it will post to.
         python_callable = main, # The main function.
-        dag = disney_scraper_dag # The physical DAG that will execute.
+        dag = add_to_database_dag # The physical DAG that will execute.
         )

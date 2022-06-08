@@ -1,7 +1,7 @@
 # ####################### Standard Libraries #####################################
 # import os
 # from selenium.webdriver.common.by import By
-# ####################### My Libraries ###########################################
+################################# My Libraries #################################
 
 # folder = str(os.getcwd())
 # folder = folder.replace("C:", "")
@@ -23,7 +23,5 @@
 #             print(os.path.join(root, name))
 #             print("end dirname")
 
-try:
-    1/0
-except Exception as e:
-    print(f"Couldn't because {e}")
+import sys
+sys.path
