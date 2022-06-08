@@ -5,6 +5,8 @@ from scraper import scrape_every_page
 import organize_job_details as organize
 ################################################################################
 
+# TODO: make job dictionary keys into tuples with job posting date and job id
+# TODO: aggressively filter out postings without Data or Engineer
 # TODO: find file using absolute paths
 
 def create_csv(d):

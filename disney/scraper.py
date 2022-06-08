@@ -3,6 +3,7 @@ from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.by import By
+import time
 ####################### My Libraries ###########################################
 from filter_job_results import find_in_description
 ################################################################################
@@ -11,7 +12,7 @@ def launch_browser(url):
     options = webdriver.ChromeOptions()
     options.add_experimental_option("detach", True)
     driver = webdriver.Chrome(options= options, service=Service(ChromeDriverManager().install()))
-    # driver.minimize_window()
+    driver.minimize_window()
     driver.get(url)
     return driver
 
@@ -38,16 +39,19 @@ def split_and_clean(list_of_web_elements, HTMLelement=''):
     return search_page_jobs
 
 
-def scrape_every_page(pages, HTMLelement='</tr>'):
+def scrape_every_page(pages = "", HTMLelement = '</tr>'):
     """ 1. Opens Data Engineer search page and maximizes window
         2. Clicks the x on the cookie warning pop up, if there
         3. Looks for tag that holds HTML high level job posting data on the search page and puts that data into a web element list
         4. Cleans the white space and some of the tags to put each job data as an item in a list
         5. Stops when there are no more pages to go through
          """
-    url = "https://jobs.disneycareers.com/search-jobs/data%20engineer/391-28648/1?glat=40.71427&glon=-74.00597"
+    url = "https://jobs.disneycareers.com/search-jobs/data%20engineer/"
     driver = launch_browser(url)
-    driver.maximize_window()
+    # class that holds amount of pages within job search. text is "of [number]"
+    if pages == "":
+        pages = driver.find_element(By.CLASS_NAME, value='pagination-total-pages') 
+        pages = int(pages.text[-2:])
 
     search_page_job_list = []
     while pages > 0: 
@@ -62,6 +66,7 @@ def scrape_every_page(pages, HTMLelement='</tr>'):
         next = driver.find_element(By.LINK_TEXT, value='Next') # text that holds next page info
         driver.execute_script("arguments[0].click();", next) # clicking the next button using javascript
         pages -= 1
+        time.sleep(2)
     print(f"Jobs found: {len(search_page_job_list)}")
     return search_page_job_list
 
