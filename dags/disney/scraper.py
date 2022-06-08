@@ -10,7 +10,7 @@ from filter_job_results import find_in_description
 
 def launch_browser(url):
     options = webdriver.ChromeOptions()
-    options.add_experimental_option("detach", True)
+    options.add_experimental_option("detach", True) # chromedriver closes without thid option
     driver = webdriver.Chrome(options= options, service=Service(ChromeDriverManager().install()))
     driver.minimize_window()
     driver.get(url)
