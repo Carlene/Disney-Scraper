@@ -4,25 +4,33 @@ from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.by import By
 ####################### My Libraries ###########################################
+from filter_job_results import find_in_description
 ################################################################################
 
-def launchBrowser():
+def launch_browser(url):
     options = webdriver.ChromeOptions()
     options.add_experimental_option("detach", True)
     driver = webdriver.Chrome(options= options, service=Service(ChromeDriverManager().install()))
     # driver.minimize_window()
-    driver.get("https://jobs.disneycareers.com/search-jobs/data%20engineer/391-28648/1?glat=40.71427&glon=-74.00597")
+    driver.get(url)
     return driver
 
-
-def split_and_clean(list_of_web_elements, HTMLelement):
-    """ 1. Goes through a list of lists of WebElements
+# TODO: combine the part of scrape every page where i look for the job posting holder info 
+def split_and_clean(list_of_web_elements, HTMLelement=''):
+    """ 1. Goes through a list of lists of WebElements on the job search page
         2. Turns it into a python list of lists, removes unnecessary white space
         3. Splits up the WebElement by a specific HTML element (for job postings, the tag is <tr>)
         """
     search_page_jobs = ""
-    for web_element in list_of_web_elements:
-        search_page_jobs += web_element.get_attribute('innerHTML')
+
+    if HTMLelement == "": # we're within a job posting
+        for web_element in list_of_web_elements:
+            web_element = web_element.text.replace("\n", " ")
+            search_page_jobs += web_element
+        return search_page_jobs
+    else: #we're on the main job search page
+        for web_element in list_of_web_elements:
+            search_page_jobs += web_element.get_attribute('innerHTML')
 
     clean_jobs = search_page_jobs.replace("\n", "")
     clean_jobs = " ".join(clean_jobs.split())
@@ -30,14 +38,15 @@ def split_and_clean(list_of_web_elements, HTMLelement):
     return search_page_jobs
 
 
-def scrape_every_page(pages, HTMLelement):
+def scrape_every_page(pages, HTMLelement='</tr>'):
     """ 1. Opens Data Engineer search page and maximizes window
         2. Clicks the x on the cookie warning pop up, if there
         3. Looks for tag that holds HTML high level job posting data on the search page and puts that data into a web element list
         4. Cleans the white space and some of the tags to put each job data as an item in a list
         5. Stops when there are no more pages to go through
          """
-    driver = launchBrowser()
+    url = "https://jobs.disneycareers.com/search-jobs/data%20engineer/391-28648/1?glat=40.71427&glon=-74.00597"
+    driver = launch_browser(url)
     driver.maximize_window()
 
     search_page_job_list = []
@@ -66,16 +75,14 @@ def add_disney_url(paths):
     return full_links
 
 
-# TODO: count links and do something if count is off (15 a page)
-description_div = "ats-description"
-
 def grab_job_data_from_multiple_links(paths):
     """ 1. Opens a web browser (minimizes the window)
         2. Opens a specific job link 
-        3. Grabs the HTML text where the job description is held
-        4. Creates a list of details per job 
+        3. Grabs the HTML text where the job description is held, and cleans it, and turns it into a string
+        4. Splits up different parts of the job description into education, qualifications, etc.
+        4. Creates a list of job description details per job 
         5. Creates a mapping of all job details to job id of posting"""
-    messy_descriptions_by_job_id = {}
+    post_descriptions_by_job_id = {}
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
     driver.minimize_window()
     urls = add_disney_url(paths)
@@ -83,9 +90,26 @@ def grab_job_data_from_multiple_links(paths):
     for url in urls:
         job_id = url.split("/", )[-1]
         driver.get(url)
-        # driver.implicitly_wait(10) # pls wait until the elements are found ty
-        job_description = driver.find_elements(By.CLASS_NAME, value=description_div)
-        desc = split_and_clean(job_description, "<h2>")
-        messy_descriptions_by_job_id[job_id] = desc
-    print(f"Amount of job ids with job details kept: {len(messy_descriptions_by_job_id)}")
-    return messy_descriptions_by_job_id
+        driver.implicitly_wait(10) # pls wait until the elements are found ty
+        job_description = driver.find_elements(By.CLASS_NAME, value="ats-description")
+        desc = split_and_clean(job_description)
+        # filter out text that's actually needed
+        responsibilities = find_in_description(desc, "Responsibilities:", "Qualifications")
+        basic_qualifications = find_in_description(desc, "Basic Qualifications:", "Preferred Qualifications:")
+        preferred_qualifications = find_in_description(desc, "Preferred Qualifications:", "Required Education")
+        education = find_in_description(desc, "Required Education", "Additional Information:")
+        preferred_education = find_in_description(desc, "Preferred Education", "Additional Information:")
+        key_qualifications = find_in_description(desc, "Key Qualifications", "Nice To Haves")
+        nice_to_haves = find_in_description(desc, "Nice To Haves", "Additional Information:")
+        #and put it all together
+        post_descriptions_by_job_id[job_id] = {
+            "responsibilities" : responsibilities,
+            "basic_qualifications" : basic_qualifications,
+            "preferred_qualifications" : preferred_qualifications,
+            "education" : education,
+            "preferred_education" : preferred_education,
+            "key_qualifications" : key_qualifications,
+            "nice_to_haves" : nice_to_haves
+            }
+    print(f"Amount of job ids with job details kept: {len(post_descriptions_by_job_id)}")
+    return post_descriptions_by_job_id
