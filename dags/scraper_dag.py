@@ -21,7 +21,7 @@ with DAG(
     "disney_scraper",
     tags = ["scraper", "disney"],
     default_args = default_args,
-    description = "Loads data into rates.boosted_spend table",
+    description = "Creates a csv in AWS with Disney job data",
     catchup = False 
     ) as disney_scraper_dag:
 
