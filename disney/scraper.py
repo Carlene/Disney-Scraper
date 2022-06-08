@@ -25,8 +25,8 @@ def split_and_clean(list_of_web_elements, HTMLelement=''):
 
     if HTMLelement == "": # we're within a job posting
         for web_element in list_of_web_elements:
-            search_page_jobs += web_element.text
-
+            web_element = web_element.text.replace("\n", " ")
+            search_page_jobs += web_element
         return search_page_jobs
     else: #we're on the main job search page
         for web_element in list_of_web_elements:
@@ -75,16 +75,14 @@ def add_disney_url(paths):
     return full_links
 
 
-# TODO: count links and do something if count is off (15 a page)
-description_div = "ats-description"
-
 def grab_job_data_from_multiple_links(paths):
     """ 1. Opens a web browser (minimizes the window)
         2. Opens a specific job link 
-        3. Grabs the HTML text where the job description is held
-        4. Creates a list of details per job 
+        3. Grabs the HTML text where the job description is held, and cleans it, and turns it into a string
+        4. Splits up different parts of the job description into education, qualifications, etc.
+        4. Creates a list of job description details per job 
         5. Creates a mapping of all job details to job id of posting"""
-    messy_descriptions_by_job_id = {}
+    post_descriptions_by_job_id = {}
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
     driver.minimize_window()
     urls = add_disney_url(paths)
@@ -92,10 +90,10 @@ def grab_job_data_from_multiple_links(paths):
     for url in urls:
         job_id = url.split("/", )[-1]
         driver.get(url)
-        # driver.implicitly_wait(10) # pls wait until the elements are found ty
-        job_description = driver.find_elements(By.CLASS_NAME, value=description_div)
-        # desc = split_and_clean(job_description, "<h2>")
+        driver.implicitly_wait(10) # pls wait until the elements are found ty
+        job_description = driver.find_elements(By.CLASS_NAME, value="ats-description")
         desc = split_and_clean(job_description)
+        # filter out text that's actually needed
         responsibilities = find_in_description(desc, "Responsibilities:", "Qualifications")
         basic_qualifications = find_in_description(desc, "Basic Qualifications:", "Preferred Qualifications:")
         preferred_qualifications = find_in_description(desc, "Preferred Qualifications:", "Required Education")
@@ -103,8 +101,8 @@ def grab_job_data_from_multiple_links(paths):
         preferred_education = find_in_description(desc, "Preferred Education", "Additional Information:")
         key_qualifications = find_in_description(desc, "Key Qualifications", "Nice To Haves")
         nice_to_haves = find_in_description(desc, "Nice To Haves", "Additional Information:")
-        # messy_descriptions_by_job_id[job_id] = desc
-        messy_descriptions_by_job_id[job_id] = {
+        #and put it all together
+        post_descriptions_by_job_id[job_id] = {
             "responsibilities" : responsibilities,
             "basic_qualifications" : basic_qualifications,
             "preferred_qualifications" : preferred_qualifications,
@@ -113,5 +111,5 @@ def grab_job_data_from_multiple_links(paths):
             "key_qualifications" : key_qualifications,
             "nice_to_haves" : nice_to_haves
             }
-    print(f"Amount of job ids with job details kept: {len(messy_descriptions_by_job_id)}")
-    return messy_descriptions_by_job_id
+    print(f"Amount of job ids with job details kept: {len(post_descriptions_by_job_id)}")
+    return post_descriptions_by_job_id
