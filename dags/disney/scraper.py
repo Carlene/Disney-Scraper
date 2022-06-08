@@ -7,6 +7,10 @@ import time
 ####################### My Libraries ###########################################
 from filter_job_results import find_in_description
 ################################################################################
+options = webdriver.ChromeOptions()
+options.binary_location = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+chrome_driver_binary = "/usr/local/bin/chromedriver"
+driver = webdriver.Chrome(chrome_driver_binary, chrome_options=options)
 
 def launch_browser(url):
     options = webdriver.ChromeOptions()

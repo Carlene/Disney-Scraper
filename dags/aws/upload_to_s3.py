@@ -10,9 +10,6 @@ from aws import s3_access_key_id, s3_secret_access_key, s3_bucket
 # create a client to access resources with
 
 
-def find_disney_folders():
-    return os.getcwd()
-
 
 def s3_info():
     s3_client = boto3.client(
@@ -20,7 +17,7 @@ def s3_info():
         aws_access_key_id = s3_access_key_id,
         aws_secret_access_key = s3_secret_access_key
     )
-    object_name = "disney-scraper"
+    
 
     return s3_client, object_name
 
@@ -35,3 +32,5 @@ def s3_info():
 #         print('File successfully loaded')
 #     except:
 #         print('Client error: file could not be uploaded to S3')
+
+
