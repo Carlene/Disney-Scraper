@@ -1,4 +1,5 @@
 boto3
 pandas
+psycopg2
 selenium
 webdriver_manager

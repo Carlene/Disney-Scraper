@@ -25,9 +25,9 @@ create_table_query = """
     );
 """
 
-copy_table_query = """
-    COPY TABLE FROM "s3://disney-scraper/dags/disney/"
-    IAM_ROLE "arn:aws:iam::456987590815:role/AWSServiceRoleForRedshift"
+copy_table_query = f"""
+    COPY disney.data_engineering_postings FROM "s3://disney-scraper/dags/disney/"
+    IAM_ROLE "arn:aws:iam::{IAM_id}:role/AWSServiceRoleForRedshift"
     DELIMITER ","
     IGNOREHEADER 1; """
 
@@ -64,4 +64,5 @@ def execute_query(client, sql_query, query_note=None):
         print(f"Could not execute statement and retrieve results because: {e}")
     return query_id
 
-execute_query(rsd_client, create_table_query)
+# execute_query(rsd_client, create_table_query)
+execute_query(rsd_client, copy_table_query)
