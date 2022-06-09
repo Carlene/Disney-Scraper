@@ -1,7 +1,8 @@
-#testing or not used in project
-aws.py
+#omg amazon really gets mad about this
+aws_secrets.py
 
 #annoying
 *.pyc
 __pycache__/
 disney/__pycache__/
+dags/disney/aws_info/aws_secrets.py
