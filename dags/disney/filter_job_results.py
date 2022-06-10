@@ -1,8 +1,15 @@
-#######  Functions to filter job details pulled from the main job search page ####### 
-#TODO: Do something if functions don't find anything
-#TODO: Can maaaaybe refactor all the find functions into one function that different paramaters are given to, problem is they all have little tiny annoying differences
+####################### Standard Libraries #####################################
+####################### My Libraries ###########################################
+####################### Use Case ###############################################
+"""
+Holds scripts that filter job data from the main job search page and within job postings
+"""
+################################################################################
 
-##############  Functions to filter job details from the main job search page ############## 
+########  Functions to filter job details from the main job search page ########
+#TODO: Do something if functions don't find anything
+#TODO: Can maaaaybe refactor all the find functions into one function that different parameters are given to, problem is they all have little tiny annoying differences
+
 def find_id(job):
     """Finds the job posting id for reference"""
     id_start = "data-job-id="

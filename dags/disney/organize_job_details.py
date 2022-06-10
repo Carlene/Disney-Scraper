@@ -2,6 +2,11 @@
 ####################### My Libraries ###########################################
 from scraper import grab_job_data_from_multiple_links
 import filter_job_results as fjr
+############################# Use Case #########################################
+"""
+Holds scripts that clean up data from the main Disney job search page, and from each job posting
+"""
+################################################################################
 
 def separate_job_posts(list_of_jobs):
     """Separates details found on the job search page into necessary fields: 

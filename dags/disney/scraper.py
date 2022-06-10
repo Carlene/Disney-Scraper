@@ -7,6 +7,11 @@ import time
 ####################### My Libraries ###########################################
 from filter_job_results import find_in_description
 ################################################################################
+######################## Use Case ##############################################
+"""
+Holds scripts that launch a browser, and wanders through the Disney search page and job postings pages
+"""
+################################################################################
 
 def launch_browser(url):
     options = webdriver.ChromeOptions()
