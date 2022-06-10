@@ -63,8 +63,11 @@ def scrape_every_page(pages = "", HTMLelement = '</tr>'):
         driver.implicitly_wait(10)
         web_element_jobs = driver.find_elements(By.TAG_NAME, value='tbody') # tag that holds job postings info
         search_page_job_list += split_and_clean(web_element_jobs, HTMLelement) 
-        next = driver.find_element(By.LINK_TEXT, value='Next') # text that holds next page info
-        driver.execute_script("arguments[0].click();", next) # clicking the next button using javascript
+        try:
+            next = driver.find_element(By.LINK_TEXT, value='Next') # text that holds next page info
+            driver.execute_script("arguments[0].click();", next) # clicking the next button using javascript
+        except:
+            print("Next button isn't there")
         pages -= 1
         time.sleep(2)
     print(f"Jobs found: {len(search_page_job_list)}")

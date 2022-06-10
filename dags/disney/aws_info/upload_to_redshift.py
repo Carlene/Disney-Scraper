@@ -64,5 +64,5 @@ def execute_query(client, sql_query, query_note=None):
         print(f"Could not execute statement and retrieve results because: {e}")
     return query_id
 
-# execute_query(rsd_client, create_table_query)
+execute_query(rsd_client, create_table_query)
 execute_query(rsd_client, copy_table_query)

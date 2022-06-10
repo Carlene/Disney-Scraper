@@ -38,8 +38,8 @@ def create_csv(d):
 
 def main():
     """Run all necessary functions. Return: None """
-    pages = 1 # comment out when script runs properly 
-    search_page_job_list = scrape_every_page(pages) # comment out pages when script runs properly 
+    # pages = 1 # comment out when script runs properly 
+    search_page_job_list = scrape_every_page() # comment out pages when script runs properly 
     all_job_details_by_id = organize.map_job_details_with_qualifications(search_page_job_list)
     create_csv(all_job_details_by_id)
     upload_to_s3("disney.csv")
