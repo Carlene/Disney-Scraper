@@ -74,7 +74,7 @@ def scrape_every_page(pages = "", HTMLelement = '</tr>'):
         except:
             print("Next button isn't there")
         pages -= 1
-        time.sleep(2)
+        time.sleep(2) # don't want to upset the mouse
     print(f"Jobs found: {len(search_page_job_list)}")
     return search_page_job_list
 
@@ -99,6 +99,8 @@ def grab_job_data_from_multiple_links(paths):
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
     driver.minimize_window()
     urls = add_disney_url(paths)
+    jobs_gotten_through = 1
+    all_jobs_count = len(urls)
 
     for url in urls:
         job_id = url.split("/", )[-1]
@@ -124,5 +126,9 @@ def grab_job_data_from_multiple_links(paths):
             "key_qualifications" : key_qualifications,
             "nice_to_haves" : nice_to_haves
             }
+        if all_jobs_count%10 == 0:
+            print(f"Gotten through {jobs_gotten_through} jobs, {all_jobs_count} to go!") # print a checkup after every 10 jobs
+        jobs_gotten_through +=1
+        all_jobs_count -= jobs_gotten_through
     print(f"Amount of job ids with job details kept: {len(post_descriptions_by_job_id)}")
     return post_descriptions_by_job_id

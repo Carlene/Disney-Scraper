@@ -24,4 +24,4 @@
 #             print("end dirname")
 
 import sys
-sys.path
+print(sys.path)

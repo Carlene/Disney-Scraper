@@ -2,16 +2,16 @@
 import boto3
 import botocore.session as bs
 ####################### My Libraries ###########################################
-from aws_secrets import *
+from aws_info.aws_secrets import *
 ############################# Use Case #########################################
 """
-This script holds functions that will uploads the CSV file created by my Disney scraper to my S3 bucket.
+This script holds functions that will upload the CSV file created by the Disney scraper to the specified S3 bucket.
 Then it uploads the data from the S3 bucket into a Redshift table
 """
 ################################################################################
 
 def upload_to_s3(csv):
-    """Takes a csv file and uploads to the specified S3 bucket. Prints error if there is one. Return: None"""
+    """Takes a csv file and uploads to the specified S3 bucket. Prints error message if there is one. Return: None"""
     s3_client = boto3.client(
         "s3", 
         aws_access_key_id = s3_access_key_id,
@@ -89,5 +89,6 @@ def execute_query(client, sql_query, query_note=None):
         print(f"Could not execute statement and retrieve results because: {e}")
     return query_id
 
-execute_query(rsd_client, create_table_query)
-execute_query(rsd_client, copy_table_query)
+# uncomment when you want to make changes to redshift
+# execute_query(rsd_client, create_table_query)
+# execute_query(rsd_client, copy_table_query)

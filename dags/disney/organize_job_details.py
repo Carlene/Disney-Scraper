@@ -4,7 +4,7 @@ from scraper import grab_job_data_from_multiple_links
 import filter_job_results as fjr
 ############################# Use Case #########################################
 """
-Holds scripts that clean up data from the main Disney job search page, and from each job posting
+Uses clean up scripts to grab different job details from job postings
 """
 ################################################################################
 
