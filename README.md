@@ -1,7 +1,13 @@
-# Job Scraper
-(WIP) Will go through Data job listings, and return a csv of job titles, descriptions, qualifications, and responsibilities for each job posting.
+# Disney Data Job Scraper
 
-At the moment, run.py is the file that will run the scraper and dump the data into a CSV file.
+This scraper can be given a Disney job search link (at the moment, it pulls all Data Engineering related jobs), and it will pull information about each job's:
+* Title
+* Path to Job Posting
+* Posting Date
+* Location
+* Brand
+* Responsibilities
+* Education
+* Qualifications
 
-Sites the scraper works for:
-Disney
+It will then create a CSV that saves both locally and to the given S3 bucket, then pull data from the bucket into the given redshift database and table. 

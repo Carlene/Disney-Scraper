@@ -1,8 +1,4 @@
-#omg amazon really gets mad about this
-aws_secrets.py
-
-#annoying
+# Annoying
 *.pyc
 __pycache__/
 disney/__pycache__/
-dags/disney/aws_info/aws_secrets.py
