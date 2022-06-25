@@ -1,8 +1,8 @@
 ####################### Standard Libraries #####################################
 from datetime import datetime as dt
 ####################### My Libraries ###########################################
-from scraper import grab_job_data_from_multiple_links
-import filter_job_results as fjr
+from dags.disney.scraper import grab_job_data_from_multiple_links
+import dags.disney.filter_job_results as fjr
 ############################# Use Case #########################################
 """
 Uses clean up scripts to grab different job details from job postings

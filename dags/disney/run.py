@@ -2,9 +2,9 @@
 import pandas as pd
 from datetime import datetime as dt, timedelta
 ####################### My Libraries ###########################################
-from scraper import scrape_every_page
-from organize_job_details import map_job_details_with_qualifications
-from aws_info.upload_to_aws import upload_to_s3
+from dags.disney.scraper import scrape_every_page
+from dags.disney.organize_job_details import map_job_details_with_qualifications
+from dags.disney.aws_info.upload_to_aws import upload_to_s3
 ######################## Use Case ##############################################
 """
 Run this script to upload a CSV of Disney Data Engineering jobs to the specified S3 bucket
@@ -12,13 +12,47 @@ Run this script to upload a CSV of Disney Data Engineering jobs to the specified
 ################################################################################
 
 # TODO: scraper is pulling all data off pages then omitting data that isn't the correct date. 
-# should check for date first and not pull data if it's the wrong date
+# should check for date first and not pull data if it's the wrong date, to make backfilling faster
 # TODO: find file using absolute paths
 
-def create_csv(d, date_pulled):
+job_qualifications = [
+    'Python', 'R ','AWS','Warehouse','Data Warehouse', 'Hive', 'Azure', 'Cloud', 'Java', 
+    'C++', 'C ', 'Airflow', 'SQL', 'Database', 'Postgres', 'Machine Learning', 'Big Data',
+     'ETL', 'Kafka', 'Apache Spark', 'PySpark', 'Scala','Terraform', 'Redshift','Pipeline', 'Hadoop',
+     "Docker", "GitLab", "GitHub"
+     ]
+
+education = {
+    "bachelor's degree": ["bachelor's", "bachelors degree"],
+    "associate's degree": ["associate's", "associates degree"],
+    "master's degree": ["master's degree", "masters degree"],
+    "PhD": ["phd"]
+    }
+
+def find_keywords(df):
+    """ Check for keywords and throw away the rest """
+    df["responsibilities"] = df["responsibilities"].str.lower()
+    df["basic_qualifications"] = df["basic_qualifications"].str.lower()
+    df["preferred_qualifications"] = df["preferred_qualifications"].str.lower()
+    df["education"] = df["education"].str.lower()
+    df["preferred_education"] = df["preferred_education"].str.lower()
+    df["key_qualifications"] = df["key_qualifications"].str.lower()
+    return df
+
+
+def create_csv(d, date_pulled=""):
     """ Creates a CSV from a dictionary, with naming convention "datepulled_disney.csv" """
-    df = pd.DataFrame.from_dict(d, orient="index")
-    return df.to_csv(f"{date_pulled}_disney.csv")
+    if type(d) == dict:
+        disney_data = pd.DataFrame.from_dict(d, orient="index")
+    else:
+        try:
+            disney_data = pd.read_csv(d)
+        except:
+            print("This isn't a dataframe")
+        disney_data = find_keywords(disney_data)
+
+    return disney_data.to_csv(f"{date_pulled}_disney.csv")
+
 
 def main(start_date=""):
     """Run all necessary functions. Return: None
@@ -40,4 +74,4 @@ def main(start_date=""):
 
 if __name__ == "__main__":
     # change for start date wanted
-    main(start_date="2022-06-11")
+    main(start_date="")

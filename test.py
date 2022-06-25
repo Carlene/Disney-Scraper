@@ -1,21 +1,8 @@
 # ####################### Standard Libraries #####################################
-# import os
-# from selenium.webdriver.common.by import By
-import datetime as dt
+import pandas as pd
+from datetime import datetime as dt, timedelta
 ################################# My Libraries #################################
+from dags.disney.run import create_csv
 
-date = "May 10, 2022"
-try:
-    date = dt.datetime.strptime(date, '%b. %d, %Y').date()
-    print(date)
-except ValueError:
-    try:
-        date = dt.datetime.strptime(date, '%B %d, %Y').date()
-        print(date)
-    except Exception as e:
-        print(e)
-# date = "2022-06-10"
-# date = dt.datetime.strptime(date, '%Y-%m-%d').date()
+print(create_csv("disney.csv").head())
 
-# today = dt.datetime.today().date()
-# print(date < today)

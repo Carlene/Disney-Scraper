@@ -2,7 +2,7 @@
 import boto3
 import botocore.session as bs
 ####################### My Libraries ###########################################
-from aws_info.aws_secrets import *
+from dags.disney.aws_info.aws_secrets import *
 ############################# Use Case #########################################
 """
 This script holds functions that will upload the CSV file created by the Disney scraper to the specified S3 bucket.

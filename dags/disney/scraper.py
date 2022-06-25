@@ -5,7 +5,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.by import By
 import time
 ####################### My Libraries ###########################################
-from filter_job_results import find_in_description
+from dags.disney.filter_job_results import find_in_description
 ################################################################################
 ######################## Use Case ##############################################
 """
