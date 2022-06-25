@@ -1,6 +1,6 @@
 ####################### Standard Libraries #####################################
 import pandas as pd
-from datetime import datetime as dt
+from datetime import datetime as dt, timedelta
 ####################### My Libraries ###########################################
 from scraper import scrape_every_page
 from organize_job_details import map_job_details_with_qualifications
@@ -28,15 +28,16 @@ def main(start_date=""):
     Then uploads that data to the S3
     Return: None
      """
-    today = dt.today().date()
-    if start_date != "":
+    yesterday = dt.today().date()-timedelta(days=1)
+    if start_date != "": # scrape for job postings from given start date (to backfill)
         start_date = dt.strptime(start_date, '%Y-%m-%d').date()
-    else:
-        start_date = today
+    else: # scrape for yesterday's job postings
+        start_date = yesterday
     search_page_job_list = scrape_every_page()  
     all_job_details_by_id = map_job_details_with_qualifications(search_page_job_list, start_date=start_date)
     create_csv(all_job_details_by_id, start_date)
     # upload_to_s3("disney.csv")
 
 if __name__ == "__main__":
-    main()
+    # change for start date wanted
+    main(start_date="2022-06-11")
