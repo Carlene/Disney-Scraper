@@ -19,18 +19,21 @@ Run this script to upload a CSV of Disney Data Engineering jobs to the specified
 # TODO: find file using absolute paths
 
 
-def create_csv(d, date_pulled=""):
-    """ Creates a CSV from a dictionary, with naming convention "datepulled_disney.csv" """
-    if type(d) == dict:
-        disney_data = pd.DataFrame.from_dict(d, orient="index")
-    else:
+def create_csv(data, date_pulled=""):
+    """ 
+    When given a dictionary, creates a CSV file from the data (pretty unclean data from disney) named
+    When given a dataframe, applies more filtering functions, and only returns necessary columns to create a CSV file for Redshift
+    """
+    if type(data) == dict: # just give us everything 
+        disney_data = pd.DataFrame.from_dict(data, orient="index")
+        disney_data.to_csv(f"raw_{date_pulled}_disney.csv")
+    else: # try to only give keywords instead of literally all the strings
         try:
-            disney_data = pd.read_csv(d)
+            disney_data = pd.read_csv(data)
         except Exception as e:
             print(f"This isn't a CSV file: {e}")
         disney_data = find_keywords(disney_data)
-
-    disney_data.to_csv(f"{date_pulled}_disney.csv")
+        disney_data.to_csv(f"{date_pulled}_disney.csv")
     print("All done!")
     return disney_data.head()
 
@@ -50,7 +53,8 @@ def main(start_date=""):
         start_date = yesterday
     search_page_job_list = scrape_every_page()  
     all_job_details_by_id = map_job_details_with_qualifications(search_page_job_list, start_date=start_date)
-    create_csv(all_job_details_by_id, start_date)
+    create_csv(all_job_details_by_id, start_date) # raw pull
+    print(create_csv("disney.csv")) # cleaned pull
     # upload_to_s3("disney.csv")
 
 if __name__ == "__main__":
