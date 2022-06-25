@@ -117,3 +117,59 @@ def find_in_description(job:str, starting_str:str, ending_str:str):
             return "NA"
     id = job[starting_i + len(starting_str) : ending_i] 
     return id
+
+############################  FILTER DATAFRAME AT END #############################
+
+job_qualifications = [
+    'Python', 'R ','AWS','Warehouse','Data Warehouse', 'Hive', 'Azure', 'Cloud', 'Java', 
+    'C++', 'C ', 'Airflow', 'SQL', 'Database', 'Postgres', 'Machine Learning', 'Big Data',
+     'ETL', 'Kafka', 'Apache Spark', 'PySpark', 'Scala','Terraform', 'Redshift','Pipeline', 'Hadoop',
+     "Docker", "GitLab", "GitHub"
+     ]
+
+education = {
+    "bachelor's degree": ["bachelor's", "bachelors"],
+    "associate's degree": ["associate's", "associates"],
+    "master's degree": ["master's", "masters"],
+    "PhD": ["phd"]
+    }
+
+
+def match_education(row):
+    degree_list = []
+    for degree, keywords in education.items():
+        for keyword in keywords:
+            if keyword in str(row):
+                degree_list.append(keyword)
+    return degree_list
+
+
+def match_quals(row):
+    qual_list = []
+    for qual in job_qualifications:
+        if qual.lower() in str(row):
+            qual_list.append(qual)
+    return qual_list
+
+
+def find_keywords(df):
+    """ Check for keywords and throw away the rest """
+    # fixing unnamed id column
+    df.rename(columns= {"Unnamed: 0" : "id"}, inplace=True)
+
+    # make those details lowercased
+    df["responsibilities"] =  df["responsibilities"].str.lower()
+    df["basic_qualifications"] = df["basic_qualifications"].str.lower()
+    df["preferred_qualifications"] = df["preferred_qualifications"].str.lower()
+    df["education"] = df["education"].str.lower()
+    df["preferred_education"] = df["preferred_education"].str.lower()
+    df["key_qualifications"] = df["key_qualifications"].str.lower()
+
+    # education_keywords = []
+
+    df["education_keywords"] = df["education"].apply(match_education)
+    df["qual_keywords"] = df["basic_qualifications"].apply(match_quals)
+    #id title location date posted qual edu
+    df = df[["id", "title", "locations", "posting_date", "education_keywords", "qual_keywords"]]
+
+    return df
