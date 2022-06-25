@@ -1,4 +1,5 @@
 boto3
+google.cloud
 pandas
 psycopg2
 selenium

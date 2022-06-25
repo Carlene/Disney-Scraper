@@ -1,27 +1,21 @@
 # ####################### Standard Libraries #####################################
 # import os
 # from selenium.webdriver.common.by import By
+import datetime as dt
 ################################# My Libraries #################################
 
-# folder = str(os.getcwd())
-# folder = folder.replace("C:", "")
-# print(folder)
-# for root, dirs, files in os.walk("."):
-#     if "git" in root:
-#         continue
-#     elif "ipynb" in root:
-#         continue
-#     elif "pycache" in root:
-#         continue
-#     else:
-#         for name in files:
-#             print("filename")
-#             print(os.path.join(root, name))
-#             print("end filename")
-#         for name in dirs:
-#             print("dirname")
-#             print(os.path.join(root, name))
-#             print("end dirname")
+date = "May 10, 2022"
+try:
+    date = dt.datetime.strptime(date, '%b. %d, %Y').date()
+    print(date)
+except ValueError:
+    try:
+        date = dt.datetime.strptime(date, '%B %d, %Y').date()
+        print(date)
+    except Exception as e:
+        print(e)
+# date = "2022-06-10"
+# date = dt.datetime.strptime(date, '%Y-%m-%d').date()
 
-import sys
-print(sys.path)
+# today = dt.datetime.today().date()
+# print(date < today)

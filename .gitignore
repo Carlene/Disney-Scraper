@@ -2,3 +2,5 @@
 *.pyc
 __pycache__/
 disney/__pycache__/
+Disney Scraper Writeup.pdf
+dags/disney/gcp_info/*

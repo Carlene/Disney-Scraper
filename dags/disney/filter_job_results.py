@@ -1,5 +1,5 @@
 ####################### Standard Libraries #####################################
-####################### My Libraries ###########################################
+from datetime import datetime as dt
 ####################### Use Case ###############################################
 """
 Holds scripts that filter job data from the main job search page and within job postings
@@ -75,7 +75,15 @@ def find_posting_date(job):
     starting_i = job.find(posting_date_start) + 2 #to avoid " and >
     ending_i = job.find(posting_date_end, starting_i+1) # to start looking for spans after the brand start
 
-    posting_date = job[starting_i + len(posting_date_start) : ending_i]
+    date_str = job[starting_i + len(posting_date_start) : ending_i]
+    # convert string to date for future comparison
+    try:
+        posting_date = dt.strptime(date_str, '%b. %d, %Y').date() # sometimes comes in as Jun. 3, 2022
+    except ValueError:
+        try:
+            posting_date = dt.strptime(date_str, '%B %d, %Y').date() # but also sometimes comes in as May 3, 2022
+        except Exception as e:
+            print(e)
     return posting_date
 
 
