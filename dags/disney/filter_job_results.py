@@ -128,7 +128,7 @@ job_qualifications = [
      ]
 
 education = {
-    "bachelor's degree": ["bachelor's", "bachelors"],
+    "bachelor's degree": ["bachelor's", "bachelors", "bachelor"],
     "associate's degree": ["associate's", "associates"],
     "master's degree": ["master's", "masters"],
     "PhD": ["phd"]
@@ -136,12 +136,22 @@ education = {
 
 
 def match_education(row):
+    """chec"""
     degree_list = []
     for degree, keywords in education.items():
         for keyword in keywords:
             if keyword in str(row):
                 degree_list.append(keyword)
     return degree_list
+
+# try to use function on both rows (doesn't work)
+# def match_education(row, row2):
+#     degree_list = []
+#     for degree, keywords in education.items():
+#         for keyword in keywords:
+#             if keyword in str(row) or str(row2):
+#                 degree_list.append(keyword)
+#     return degree_list
 
 
 def match_quals(row):
@@ -152,24 +162,24 @@ def match_quals(row):
     return qual_list
 
 
-def find_keywords(df):
+def find_keywords(disney_df):
     """ Check for keywords and throw away the rest """
     # fixing unnamed id column
-    df.rename(columns= {"Unnamed: 0" : "id"}, inplace=True)
-
+    disney_df.rename(columns= {"Unnamed: 0" : "id"}, inplace=True)
     # make those details lowercased
-    df["responsibilities"] =  df["responsibilities"].str.lower()
-    df["basic_qualifications"] = df["basic_qualifications"].str.lower()
-    df["preferred_qualifications"] = df["preferred_qualifications"].str.lower()
-    df["education"] = df["education"].str.lower()
-    df["preferred_education"] = df["preferred_education"].str.lower()
-    df["key_qualifications"] = df["key_qualifications"].str.lower()
+    print(disney_df.info())
+    # convert to string (in case its all nulls) and make lowercase
+    disney_df["responsibilities"] =  disney_df["responsibilities"].astype(str).str.lower()
+    disney_df["basic_qualifications"] = disney_df["basic_qualifications"].astype(str).str.lower()
+    disney_df["preferred_qualifications"] = disney_df["preferred_qualifications"].astype(str).str.lower()
+    disney_df["education"] = disney_df["education"].astype(str).str.lower()
+    disney_df["preferred_education"] = disney_df["preferred_education"].astype(str).str.lower()
+    disney_df["key_qualifications"] = disney_df["key_qualifications"].astype(str).str.lower()
+    # use functions to get degree mentions or qualification keywords
+    disney_df["education_keywords"] = disney_df["education"].apply(match_education)
+    disney_df["qual_keywords"] = disney_df["basic_qualifications"].apply(match_quals)
+    # only grab necessary columns
+    disney_df = disney_df[["id", "title", "locations", "posting_date", "education_keywords", "qual_keywords"]]
+    print(disney_df.head())
 
-    # education_keywords = []
-
-    df["education_keywords"] = df["education"].apply(match_education)
-    df["qual_keywords"] = df["basic_qualifications"].apply(match_quals)
-    #id title location date posted qual edu
-    df = df[["id", "title", "locations", "posting_date", "education_keywords", "qual_keywords"]]
-
-    return df
+    return disney_df

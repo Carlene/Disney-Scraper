@@ -5,7 +5,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.by import By
 import time
 ####################### My Libraries ###########################################
-from dags.disney.filter_job_results import find_in_description
+from filter_job_results import find_in_description
 ################################################################################
 ######################## Use Case ##############################################
 """
@@ -53,6 +53,7 @@ def scrape_every_page(pages = "", HTMLelement = '</tr>'):
          """
     url = "https://jobs.disneycareers.com/search-jobs/data%20engineer/"
     driver = launch_browser(url)
+    count = 0
     # class that holds amount of pages within job search. text is "of [number]"
     if pages == "":
         pages = driver.find_element(By.CLASS_NAME, value='pagination-total-pages') 
@@ -74,6 +75,8 @@ def scrape_every_page(pages = "", HTMLelement = '</tr>'):
         except:
             print("Next button isn't there")
         pages -= 1
+        count += 1
+        print(f"{count} down, {pages} pages to go!:D")
         time.sleep(2) # don't want to upset the mouse
     print(f"Jobs found: {len(search_page_job_list)}")
     return search_page_job_list
@@ -126,9 +129,8 @@ def grab_job_data_from_multiple_links(paths):
             "key_qualifications" : key_qualifications,
             "nice_to_haves" : nice_to_haves
             }
-        if all_jobs_count%10 == 0:
-            print(f"Gotten through {jobs_gotten_through} jobs, {all_jobs_count} to go!") # print a checkup after every 10 jobs
+        print(f"Gotten through {jobs_gotten_through} jobs, {all_jobs_count} to go!") # print a checkup 
         jobs_gotten_through +=1
-        all_jobs_count -= jobs_gotten_through
+        all_jobs_count -= 1
     print(f"Amount of job ids with job details kept: {len(post_descriptions_by_job_id)}")
     return post_descriptions_by_job_id

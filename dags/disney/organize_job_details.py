@@ -1,8 +1,8 @@
 ####################### Standard Libraries #####################################
 from datetime import datetime as dt
 ####################### My Libraries ###########################################
-from dags.disney.scraper import grab_job_data_from_multiple_links
-import dags.disney.filter_job_results as fjr
+from scraper import grab_job_data_from_multiple_links
+import filter_job_results as fjr
 ############################# Use Case #########################################
 """
 Uses clean up scripts to grab different job details from job postings
@@ -24,8 +24,9 @@ def separate_job_posts(list_of_jobs, start_date=""):
     for job in list_of_jobs:
         if len(job) > 0:
             posting_date = fjr.find_posting_date(job)
-            # only want postings for given start_date
-            if posting_date == start_date:
+            # want all past postings
+            # TODO: oh yeah, jobs can get DELETED. need to have a file for all jobs ever and live jobs
+            if posting_date <= start_date:
                 path = fjr.find_path(job)
                 id = fjr.find_id(job)
                 title = fjr.find_title(job)
