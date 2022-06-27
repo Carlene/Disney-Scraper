@@ -6,7 +6,7 @@ import numpy as np
 from scraper import scrape_every_page
 from organize_job_details import map_job_details_with_qualifications
 from aws_info.upload_to_aws import upload_to_s3
-from filter_job_results import find_keywords
+from clean_disney_data import find_keywords
 ######################## Use Case ##############################################
 """
 Run this script to upload a CSV of Disney Data Engineering jobs to the specified S3 bucket
@@ -60,4 +60,4 @@ def main(start_date:str = "", pages:int = ""):
 
 if __name__ == "__main__":
     # change for start date and amount of pages wanted (defaults to yesterday and for all pages)
-    main(start_date = "", pages = "")
+    main(start_date = "", pages = 1)

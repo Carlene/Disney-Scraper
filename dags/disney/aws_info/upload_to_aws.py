@@ -3,6 +3,7 @@ import boto3
 import botocore.session as bs
 ####################### My Libraries ###########################################
 from aws_info.aws_secrets import *
+from aws_info.queries import *
 ############################# Use Case #########################################
 """
 This script holds functions that will upload the CSV file created by the Disney scraper to the specified S3 bucket.
@@ -27,34 +28,6 @@ def upload_to_s3(csv):
         print("File successfully uploaded")
     except Exception as e:
         print(f"File could not be uploaded to S3 because: {e}")
-
-
-# creating queries
-create_table_query = """
-    CREATE SCHEMA disney;
-    DROP TABLE IF EXISTS disney.data_engineering_postings;
-    CREATE TABLE disney.data_engineering_postings(
-        id int,
-        path varchar,
-        title varchar,
-        brand varchar,
-        locations varchar,
-        posting_date varchar,
-        responsibilities varchar,
-        basic_qualifications varchar,
-        preferred_qualifications varchar,
-        education varchar,
-        preferred_education varchar,
-        key_qualifications varchar,
-        nice_to_haves varchar
-    );
-"""
-
-copy_table_query = f"""
-    COPY disney.data_engineering_postings FROM "s3://disney-scraper/dags/disney/"
-    IAM_ROLE "arn:aws:iam::{IAM_id}:role/AWSServiceRoleForRedshift"
-    DELIMITER ","
-    IGNOREHEADER 1; """
 
 
 # create redshift data client
