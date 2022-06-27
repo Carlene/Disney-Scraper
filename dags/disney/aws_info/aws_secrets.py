@@ -1,3 +1,5 @@
+""" Edit with your S3/Redshift information """
+
 ############## S3 resources ##############
 s3_access_key_id = ""
 s3_secret_access_key = ""
