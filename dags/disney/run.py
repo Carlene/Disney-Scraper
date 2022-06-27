@@ -25,17 +25,18 @@ def create_csv(data, date_pulled=""):
     """
     if type(data) == dict: # just give us everything 
         disney_data = pd.DataFrame.from_dict(data, orient="index")
-        disney_data.to_csv(f"raw_{date_pulled}_disney.csv")
+        file_string = f"raw_{date_pulled}_disney.csv"
+        disney_data.to_csv(file_string)
     else: # try to only give keywords instead of literally all the strings
         try:
             disney_data = pd.read_csv(data)
         except Exception as e:
             print(f"This isn't a CSV file: {e}")
         disney_data = find_keywords(disney_data)
-        disney_data.to_csv(f"clean_{date_pulled}_disney.csv")
+        file_string = f"clean_{date_pulled}_disney.csv"
+        disney_data.to_csv(file_string)
     print("All done!")
     print(disney_data.head())
-    file_string = f"raw_{date_pulled}_disney.csv"
     return file_string
 
 
@@ -54,9 +55,9 @@ def main(start_date:str = "", pages:int = ""):
         start_date = yesterday
     search_page_job_list = scrape_every_page(pages=pages) 
     all_job_details_by_id = map_job_details_with_qualifications(search_page_job_list, start_date=start_date)
-    file_string = create_csv(all_job_details_by_id, start_date) # raw pull
-    print(create_csv(file_string, start_date))
-    # upload_to_s3("disney.csv")
+    raw_file_string = create_csv(all_job_details_by_id, start_date) # raw pull
+    clean_file_string = create_csv(raw_file_string, start_date)
+    # upload_to_s3(clean_file_string)
 
 if __name__ == "__main__":
     # change for start date and amount of pages wanted (defaults to yesterday and for all pages)

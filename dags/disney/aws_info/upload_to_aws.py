@@ -14,13 +14,13 @@ Then it uploads the data from the S3 bucket into a Redshift table
 def upload_to_s3(csv):
     """Takes a csv file and uploads to the specified S3 bucket. Prints error message if there is one. Return: None"""
     s3_client = boto3.client(
-        "s3", 
-        aws_access_key_id = s3_access_key_id,
-        aws_secret_access_key = s3_secret_access_key
+        "s3"
+        # aws_access_key_id = s3_access_key_id,
+        # aws_secret_access_key = s3_secret_access_key
     )
 
     file = csv
-    object_name = "dags/disney/disney.csv"
+    object_name = s3_file_path
 
     # now upload to bucket 
     try:

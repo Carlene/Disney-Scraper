@@ -23,7 +23,7 @@ create_table_query = """
 """
 
 copy_table_query = f"""
-    COPY disney.data_engineering_postings FROM '{s3_file_path}'
+    COPY disney.data_engineering_postings FROM '{s3_file_link}'
     IAM_ROLE 'arn:aws:iam::{IAM_id}:role/{redshift_role}'
     DELIMITER ','
     IGNOREHEADER 1; """
