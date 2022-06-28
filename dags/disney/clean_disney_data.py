@@ -62,7 +62,7 @@ def clean_up_dataframe(raw_disney_df):
     # and renaming unnamed job id column
     raw_disney_df.rename(columns= {"index" : "job_id"}, inplace=True)
     print(raw_disney_df.head())
-    # convert to string (in case its all nulls) and make lowercase
+    # convert to string (in case it's all nulls) and make lowercase
     raw_disney_df["responsibilities"] =  raw_disney_df["responsibilities"].astype(str).str.lower()
     raw_disney_df["basic_qualifications"] = raw_disney_df["basic_qualifications"].astype(str).str.lower()
     raw_disney_df["preferred_qualifications"] = raw_disney_df["preferred_qualifications"].astype(str).str.lower()
@@ -103,7 +103,4 @@ def split_up_dataframe(raw_disney_df, start_date):
     # locations has trailing and leading spaces
     locations_table["locations"] = locations_table["locations"].str.strip()
     
-    dfs = [dimension_table, locations_table, education_table, qualifications_table]
-    names = ["dimension_table", "locations_table", "education_table", "qualifications_table"]
-    for i in range(len(dfs)):  # create a csv file for each df
-        create_csv(dfs[i], file_string = f"{names[i]}_", date_pulled=start_date)
+    return [dimension_table, locations_table, education_table, qualifications_table]
