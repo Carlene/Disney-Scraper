@@ -6,7 +6,7 @@ import numpy as np
 from scraper import scrape_every_page
 from organize_job_details import map_job_details_with_qualifications
 from aws_info.upload_to_aws import upload_to_s3
-from clean_disney_data import find_keywords
+from clean_disney_data import create_csv, split_up_dataframe
 ######################## Use Case ##############################################
 """
 Run this script to upload a CSV of Disney Data Engineering jobs to the specified S3 bucket
@@ -16,29 +16,6 @@ Run this script to upload a CSV of Disney Data Engineering jobs to the specified
 # TODO: scraper is pulling all data off pages then omitting data that isn't the correct date. 
 # should check for date first and not pull data if it's the wrong date, to make backfilling faster
 # TODO: find file using absolute paths
-
-
-def create_csv(data, date_pulled=""):
-    """ 
-    When given a dictionary, creates a CSV file from the data (pretty unclean data from disney) named
-    When given a CSV path, turns it into a df, applies more filtering functions, and only returns necessary columns to create a CSV file for Redshift
-    """
-    if type(data) == dict: # just give us everything 
-        disney_data = pd.DataFrame.from_dict(data, orient="index")
-        file_string = f"raw_{date_pulled}_disney.csv"
-        disney_data.to_csv(file_string)
-    else: # try to only give keywords instead of literally all the strings
-        try:
-            disney_data = pd.read_csv(data)
-        except Exception as e:
-            print(f"This isn't a CSV file: {e}")
-        disney_data = find_keywords(disney_data)
-        file_string = f"clean_{date_pulled}_disney.csv"
-        disney_data.to_csv(file_string)
-    print("All done!")
-    print(disney_data.head())
-    return file_string
-
 
 def main(start_date:str = "", pages:int = ""):
     """Run all necessary functions. Return: None
@@ -53,12 +30,13 @@ def main(start_date:str = "", pages:int = ""):
         start_date = dt.strptime(start_date, '%Y-%m-%d').date()
     else: # scrape for yesterday's job postings
         start_date = yesterday
+    print(start_date)
     search_page_job_list = scrape_every_page(pages=pages) 
     all_job_details_by_id = map_job_details_with_qualifications(search_page_job_list, start_date=start_date)
-    raw_file_string = create_csv(all_job_details_by_id, start_date) # raw pull
-    clean_file_string = create_csv(raw_file_string, start_date)
+    raw_disney_df = create_csv(all_job_details_by_id, date_pulled=start_date) # raw pull
+    split_up_dataframe(raw_disney_df, start_date)
     # upload_to_s3(clean_file_string)
 
 if __name__ == "__main__":
     # change for start date and amount of pages wanted (defaults to yesterday and for all pages)
-    main(start_date = "", pages = 1)
+    main()
