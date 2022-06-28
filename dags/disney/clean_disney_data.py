@@ -29,9 +29,9 @@ job_qualifications = [
     'Cosmos', 'Javascript']
 
 education = {
-    "bachelor's degree": ["B.S", "BS", "bachelor"],
+    "bachelor's degree": ["B.S", "BS in", "bachelor"],
     "associate's degree": ["associate's", "associates"],
-    "master's degree": ["master's", "masters", "M.S", "MS"],
+    "master's degree": ["master's", "masters", "M.S", "MS in"],
     "PhD": ["phd", "doctorate", "ph.d"]
     }
 
@@ -69,10 +69,8 @@ def clean_up_dataframe(raw_disney_df):
     raw_disney_df["education"] = raw_disney_df["education"].astype(str).str.lower()
     raw_disney_df["preferred_education"] = raw_disney_df["preferred_education"].astype(str).str.lower()
     raw_disney_df["key_qualifications"] = raw_disney_df["key_qualifications"].astype(str).str.lower()
-    # combine all qualification columns
-    raw_disney_df["all_qualifications"] = raw_disney_df["basic_qualifications"] + raw_disney_df["preferred_qualifications"] + raw_disney_df["key_qualifications"]
-    # combine all education columns
-    raw_disney_df["all_education"] = raw_disney_df["education"] + raw_disney_df["preferred_education"]
+    # combine it all cause disney has no consistency across posts
+    raw_disney_df["all"] = raw_disney_df["basic_qualifications"] + raw_disney_df["preferred_qualifications"] + raw_disney_df["key_qualifications"] + raw_disney_df["education"] + raw_disney_df["preferred_education"]
     raw_disney_df.drop(columns = [
         "basic_qualifications", "preferred_qualifications", "key_qualifications", "education", "preferred_education"
         ], inplace=True)
@@ -83,8 +81,8 @@ def split_up_dataframe(raw_disney_df, start_date):
     """ Check for keywords and throw away the rest """
     clean_disney_df = clean_up_dataframe(raw_disney_df)
     # use functions to get degree mentions or qualification keywords
-    clean_disney_df["education_keywords"] = clean_disney_df["all_education"].apply(match_education)
-    clean_disney_df["qual_keywords"] = clean_disney_df["all_qualifications"].apply(match_quals)
+    clean_disney_df["education_keywords"] = clean_disney_df["all"].apply(match_education)
+    clean_disney_df["qual_keywords"] = clean_disney_df["all"].apply(match_quals)
     # only grab necessary columns
     clean_disney_df = clean_disney_df[["job_id", "title", "locations", "posting_date", "education_keywords", "qual_keywords"]]
     """ Creates four different dataframes for: location, education, qualifications, and the raw tables """
@@ -99,16 +97,13 @@ def split_up_dataframe(raw_disney_df, start_date):
     dimension_table.rename(columns = {"dim_id": "id"}, inplace=True)
     # break our lists apart and give them back a real index
     education_table = education_table.explode("education_keywords").reset_index()
-    qualifications_table = qualifications_table.explode("qual_keywords").reset_index()
-    # turn NaNs into Nones to do literal eval
-    locations_table = locations_table.where(pd.notnull(locations_table), None)
-    # locations column contains strings instead of lists
-    # locations_table["locations"] = locations_table["locations"].apply(ast.literal_eval)
+    qualifications_table = qualifications_table.explode("qual_keywords").reset_index() 
+    locations_table = locations_table.where(pd.notnull(locations_table), None) # turn NaNs into Nones
     locations_table = locations_table.explode("locations").reset_index()
     # locations has trailing and leading spaces
     locations_table["locations"] = locations_table["locations"].str.strip()
     
     dfs = [dimension_table, locations_table, education_table, qualifications_table]
     names = ["dimension_table", "locations_table", "education_table", "qualifications_table"]
-    for i in range(len(dfs)):
+    for i in range(len(dfs)):  # create a csv file for each df
         create_csv(dfs[i], file_string = f"{names[i]}_", date_pulled=start_date)
