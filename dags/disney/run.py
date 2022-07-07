@@ -31,6 +31,7 @@ def main(start_date:str = "", pages:int = ""):
     else: # scrape for yesterday's job postings
         start_date = yesterday
     print(start_date)
+    
     search_page_job_list = scrape_every_page(pages=pages) 
     all_job_details_by_id = map_job_details_with_qualifications(search_page_job_list, start_date=start_date)
     raw_disney_df = create_csv(all_job_details_by_id, date_pulled=start_date) # raw pull

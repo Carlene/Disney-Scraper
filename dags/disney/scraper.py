@@ -15,13 +15,14 @@ Holds scripts that launch a browser, and wanders through the Disney search page 
 
 def launch_browser(url):
     options = webdriver.ChromeOptions()
-    options.add_experimental_option("detach", True) # chromedriver closes without thid option
+    options.add_experimental_option("detach", True) # chromedriver closes without this option
     driver = webdriver.Chrome(options= options, service=Service(ChromeDriverManager().install()))
     driver.minimize_window()
     driver.get(url)
     return driver
 
 # TODO: combine the part of scrape every page where i look for the job posting holder info 
+# TODO: make wait a variable to change all implicit waits
 def split_and_clean(list_of_web_elements, HTMLelement=''):
     """ 1. Goes through a list of lists of WebElements on the job search page
         2. Turns it into a python list of lists, removes unnecessary white space
@@ -58,7 +59,7 @@ def scrape_every_page(pages = "", HTMLelement = '</tr>'):
     if pages == "":
         pages = driver.find_element(By.CLASS_NAME, value='pagination-total-pages') 
         pages = int(pages.text[-2:])
-
+        
     search_page_job_list = []
     while pages > 0: 
         try:
@@ -68,12 +69,14 @@ def scrape_every_page(pages = "", HTMLelement = '</tr>'):
             print(f"Cookie pop up isn't there.")
         driver.implicitly_wait(10)
         web_element_jobs = driver.find_elements(By.TAG_NAME, value='tbody') # tag that holds job postings info
-        search_page_job_list += split_and_clean(web_element_jobs, HTMLelement) 
+        search_page_job_list += split_and_clean(web_element_jobs, HTMLelement)
+
         try:
             next = driver.find_element(By.LINK_TEXT, value='Next') # text that holds next page info
             driver.execute_script("arguments[0].click();", next) # clicking the next button using javascript
         except:
             print("Next button isn't there")
+
         pages -= 1
         count += 1
         print(f"{count} down, {pages} pages to go!:D")
