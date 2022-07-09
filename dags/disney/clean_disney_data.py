@@ -19,11 +19,11 @@ def create_csv(data, file_string="", date_pulled=""):
         
     print(disney_data.head())
     print("All done!")
-    return disney_data
+    return disney_data, file_string
 
 
 job_qualifications = [
-    'Python', '[,\/; \n]R[,\/; ]', 'AWS', ' Warehouse', 'Data Warehouse', 'Hive', 'Azure', 'Cloud', 'Java', 'C\+\+', '[,\/; \n]C[,\/; ]', 
+    'Python', r'[,\/; \n]R[,\/; ]', 'AWS', 'Warehouse', 'Data Warehouse', 'Hive', 'Azure', 'Cloud', 'Java', 'C\+\+', r'[,\/; \n]C[,\/; ]', 
     'Airflow', 'SQL', 'Database', 'Postgres', 'Machine Learning', 'Big Data', 'ETL', 'Kafka', 'Spark', 'Scala',
     'Terraform', 'Redshift', 'Pipeline', 'Hadoop', 'Docker', 'GitLab', 'GitHub', 'Kubernetes', 'HCI', 'Linux', 
     'OSX', 'svn', 'Gradle', 'Maven', 'Swift', 'Matlab', 'MongoDB', 'Objective-C', 'Ruby', 'Perl', 'Pig', 'Hadoop',
@@ -53,8 +53,14 @@ def match_quals(row):
         # if qual.lower() in str(row):
             # qual_list.append(qual)
         try:
-            if len(re.match(qual.lower(), str(row)).group()) > 0:
-                qual_list.append(qual)
+            if len(re.search(qual.lower(), str(row)).group()) > 0:
+                # clean up the regexed keyword, should make into dictionary in the future
+                if qual == r'[,\/; \n]R[,\/; ]':
+                    qual_list.append("R")
+                elif qual == r'[,\/; \n]C[,\/; ]':
+                    qual_list.append("C")
+                else:
+                    qual_list.append(qual)
         except AttributeError:
             pass
     return qual_list

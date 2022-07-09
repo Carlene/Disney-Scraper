@@ -31,42 +31,108 @@ from aws_info.aws_secrets import *
 
 # creation queries in Will's S3
 
-all_data_query = """
-    DROP TABLE IF EXISTS project.staged_disney_data_jobs;
+copy_disney_tables_query = f"""
+DELETE FROM project.disney_dimensions
+WHERE TRUE;
 
-    CREATE TABLE project.staged_disney_data_jobs(
-        id VARCHAR(1000),
-        title VARCHAR(1000),
-        locations VARCHAR(1000),
-        posting_date VARCHAR(1000),
-        education VARCHAR(1000),
-        qualifications VARCHAR(1000)
-        );
+COPY project.disney_dimensions 
+FROM 's3://project-team10/disney/dimension_table.csv'
+REGION 'us-west-1'
+IAM_ROLE 'arn:aws:iam::{IAM_id}:role/{redshift_role}'
+DELIMITER ','
+IGNOREHEADER 1
+emptyasnull
+blanksasnull
+removequotes;
 
-    DROP TABLE IF EXISTS project.disney_data_jobs;
+----------------------------------------------------------------------------------
+DELETE FROM project.disney_locations
+WHERE TRUE;
 
-    CREATE TABLE project.disney_data_jobs AS
-    SELECT *
-    FROM project.staged_disney_data_jobs
-    WHERE title ILIKE '%data%';
+COPY project.disney_locations 
+FROM 's3://project-team10/disney/locations_table.csv'
+REGION 'us-west-1'
+IAM_ROLE 'arn:aws:iam::{IAM_id}:role/{redshift_role}'
+DELIMITER ','
+IGNOREHEADER 1
+emptyasnull
+blanksasnull
+removequotes;
 
-    DROP TABLE IF EXISTS project.staged_disney_data_jobs;
+----------------------------------------------------------------------------------
+DELETE FROM project.disney_education
+WHERE TRUE;
+
+COPY project.disney_education 
+FROM 's3://project-team10/disney/education_table.csv'
+REGION 'us-west-1'
+IAM_ROLE 'arn:aws:iam::{IAM_id}:role/{redshift_role}'
+DELIMITER ','
+IGNOREHEADER 1
+emptyasnull
+blanksasnull
+removequotes;
+
+----------------------------------------------------------------------------------
+DELETE FROM project.disney_qualifications
+WHERE TRUE;
+
+COPY project.disney_qualifications 
+FROM 's3://project-team10/disney/qualifications_table.csv'
+REGION 'us-west-1'
+IAM_ROLE 'arn:aws:iam::{IAM_id}:role/{redshift_role}'
+DELIMITER ','
+IGNOREHEADER 1
+emptyasnull
+blanksasnull
+removequotes;
 """
 
-tables = [
-    "dimension_table_disney.csv", 
-    "locations_table_disney.csv", 
-    "qualifications_table_disney.csv", 
-    "education_table_disney.csv"]
 
-copy_table_query = f"""
-    COPY insert_table_here
-    FROM {s3_file_link}
-    REGION 'us-west-1'
-    IAM_ROLE 'arn:aws:iam::{IAM_id}:role/{redshift_role}'
-    DELIMITER ','
-    IGNOREHEADER 1
-    emptyasnull
-    blanksasnull
-    removequotes;
+all_data_query = """
+-- locations table
+DELETE FROM project.all_job_locations
+WHERE company = 'disney';
+
+insert into project.all_job_locations(job_id, location, company)
+  select 
+  	dim_id as job_id,
+  	locations as location,
+    'disney' as company
+  from project.disney_locations
+
+-- qualifications table
+DELETE FROM project.all_job_qualifications
+WHERE company = 'disney';
+
+insert into project.all_job_qualifications(job_id, qualification, company)
+  select 
+  	dim_id as job_id,
+  	qualification,
+    'disney' as company
+  from project.disney_qualifications
+--  
+-- education table
+DELETE FROM project.all_job_education
+WHERE company = 'disney';
+
+insert into project.all_job_education(job_id, education, company)
+  select 
+  	dim_id as job_id,
+  	education_type as education,
+    'disney' as company
+  from project.disney_education
+  
+-- dimension table
+DELETE FROM project.all_job_dimensions
+WHERE company = 'disney';
+
+insert into project.all_job_dimensions(job_id, title, posting_date, company)
+  select 
+  	dim_id as job_id,
+  	title,
+    posting_date,
+    'disney' as company
+  from project.disney_dimensions
+
 """

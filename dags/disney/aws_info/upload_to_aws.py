@@ -12,7 +12,7 @@ Thanks to Correlation One for help with this script
 """
 ################################################################################
 
-def upload_to_s3(csv):
+def upload_to_s3(csv, file_string):
     """Takes a csv file and uploads to the specified S3 bucket. Prints error message if there is one. Return: None"""
     s3_client = boto3.client(
         "s3",
@@ -21,7 +21,7 @@ def upload_to_s3(csv):
     )
 
     file = csv
-    object_name = s3_file_path
+    object_name = s3_file_path + file_string
 
     # now upload to bucket 
     try:
@@ -62,7 +62,3 @@ def execute_query(client, sql_query, query_note=None):
     except Exception as e:
         print(f"Could not execute statement and retrieve results because: {e}")
     return query_id
-
-# uncomment when you want to make changes to redshift
-# execute_query(rsd_client, create_table_query)
-# execute_query(rsd_client, copy_table_query)
