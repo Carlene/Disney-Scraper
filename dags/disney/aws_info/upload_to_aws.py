@@ -8,19 +8,20 @@ from aws_info.queries import *
 """
 This script holds functions that will upload the CSV file created by the Disney scraper to the specified S3 bucket.
 Then it uploads the data from the S3 bucket into a Redshift table
+Thanks to Correlation One for help with this script
 """
 ################################################################################
 
-def upload_to_s3(csv):
+def upload_to_s3(csv, file_string):
     """Takes a csv file and uploads to the specified S3 bucket. Prints error message if there is one. Return: None"""
     s3_client = boto3.client(
-        "s3", 
+        "s3",
         aws_access_key_id = s3_access_key_id,
         aws_secret_access_key = s3_secret_access_key
     )
 
     file = csv
-    object_name = "dags/disney/disney.csv"
+    object_name = s3_file_path + file_string
 
     # now upload to bucket 
     try:
@@ -61,7 +62,3 @@ def execute_query(client, sql_query, query_note=None):
     except Exception as e:
         print(f"Could not execute statement and retrieve results because: {e}")
     return query_id
-
-# uncomment when you want to make changes to redshift
-# execute_query(rsd_client, create_table_query)
-# execute_query(rsd_client, copy_table_query)

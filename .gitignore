@@ -4,3 +4,6 @@ __pycache__/
 disney/__pycache__/
 Disney Scraper Writeup.pdf
 dags/disney/gcp_info/*
+*.csv
+redshift_queries_saved
+dags/disney/aws_info/queries.py

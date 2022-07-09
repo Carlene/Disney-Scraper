@@ -1,16 +1,38 @@
+########################## Standard Libraries #####################################
+import pandas as pd
+import re
 ############################  FILTER DATAFRAME AT END #############################
 
+def create_csv(data, file_string="", date_pulled=""):
+    """ 
+    When given a dictionary, creates a CSV file from the data (pretty unclean data from disney) named
+    When given a CSV path, turns it into a df, applies more filtering functions, and only returns necessary columns to create a CSV file for Redshift
+    """
+    if isinstance(data, dict): # just give us everything 
+        disney_data = pd.DataFrame.from_dict(data, orient="index")
+        file_string = f"raw_{date_pulled}_disney.csv"
+        disney_data.to_csv(file_string)
+    elif isinstance(data, pd.DataFrame): # when splitting up raw df to locations/educations/etc dfs
+        disney_data = data
+        file_string+=f"{date_pulled}_disney.csv"
+        disney_data.to_csv(file_string)
+        
+    print(disney_data.head())
+    print("All done!")
+    return disney_data, file_string
+
+
 job_qualifications = [
-    'Python', 'R ', 'AWS', ' Warehouse', 'Data Warehouse', 'Hive', 'Azure', 'Cloud', 'Java', 'C++', 'C ', 
+    'Python', r'[,\/; \n]R[,\/; ]', 'AWS', 'Warehouse', 'Data Warehouse', 'Hive', 'Azure', 'Cloud', 'Java', 'C\+\+', r'[,\/; \n]C[,\/; ]', 
     'Airflow', 'SQL', 'Database', 'Postgres', 'Machine Learning', 'Big Data', 'ETL', 'Kafka', 'Spark', 'Scala',
     'Terraform', 'Redshift', 'Pipeline', 'Hadoop', 'Docker', 'GitLab', 'GitHub', 'Kubernetes', 'HCI', 'Linux', 
     'OSX', 'svn', 'Gradle', 'Maven', 'Swift', 'Matlab', 'MongoDB', 'Objective-C', 'Ruby', 'Perl', 'Pig', 'Hadoop',
     'Cosmos', 'Javascript']
 
 education = {
-    "bachelor's degree": ["B.S", "BS", "bachelor"],
+    "bachelor's degree": ["B.S", "BS in", "bachelor"],
     "associate's degree": ["associate's", "associates"],
-    "master's degree": ["master's", "masters", "M.S", "MS"],
+    "master's degree": ["master's", "masters", "M.S", "MS in"],
     "PhD": ["phd", "doctorate", "ph.d"]
     }
 
@@ -28,40 +50,69 @@ def match_education(row):
 def match_quals(row):
     qual_list = []
     for qual in job_qualifications:
-        if qual.lower() in str(row):
-            qual_list.append(qual)
+        # if qual.lower() in str(row):
+            # qual_list.append(qual)
+        try:
+            if len(re.search(qual.lower(), str(row)).group()) > 0:
+                # clean up the regexed keyword, should make into dictionary in the future
+                if qual == r'[,\/; \n]R[,\/; ]':
+                    qual_list.append("R")
+                elif qual == r'[,\/; \n]C[,\/; ]':
+                    qual_list.append("C")
+                else:
+                    qual_list.append(qual)
+        except AttributeError:
+            pass
     return qual_list
 
 
-def clean_up_dataframe(disney_df):
+def clean_up_dataframe(raw_disney_df):
     """ Disney dataframe is going through some stuff, clean up the columns and change types """
-    # fixing unnamed id column
-    disney_df.rename(columns= {"Unnamed: 0" : "id"}, inplace=True)
-    # convert to string (in case its all nulls) and make lowercase
-    disney_df["responsibilities"] =  disney_df["responsibilities"].astype(str).str.lower()
-    disney_df["basic_qualifications"] = disney_df["basic_qualifications"].astype(str).str.lower()
-    disney_df["preferred_qualifications"] = disney_df["preferred_qualifications"].astype(str).str.lower()
-    disney_df["education"] = disney_df["education"].astype(str).str.lower()
-    disney_df["preferred_education"] = disney_df["preferred_education"].astype(str).str.lower()
-    disney_df["key_qualifications"] = disney_df["key_qualifications"].astype(str).str.lower()
-    # locations has trailing and leading spaces
-    disney_df["locations"] = disney_df["locations"].str.strip()
-    # combine all qualification columns
-    disney_df["all_qualifications"] = disney_df["basic_qualifications"] + disney_df["preferred_qualifications"] + disney_df["key_qualifications"]
-    # combine all education columns
-    disney_df["all_education"] = disney_df["education"] + disney_df["preferred_education"]
-    disney_df.drop(columns = [
+    # resetting the index
+    raw_disney_df.reset_index(inplace=True)
+    print(raw_disney_df.head())
+    # and renaming unnamed job id column
+    raw_disney_df.rename(columns= {"index" : "job_id"}, inplace=True)
+    print(raw_disney_df.head())
+    # convert to string (in case it's all nulls) and make lowercase
+    raw_disney_df["responsibilities"] =  raw_disney_df["responsibilities"].astype(str).str.lower()
+    raw_disney_df["basic_qualifications"] = raw_disney_df["basic_qualifications"].astype(str).str.lower()
+    raw_disney_df["preferred_qualifications"] = raw_disney_df["preferred_qualifications"].astype(str).str.lower()
+    raw_disney_df["education"] = raw_disney_df["education"].astype(str).str.lower()
+    raw_disney_df["preferred_education"] = raw_disney_df["preferred_education"].astype(str).str.lower()
+    raw_disney_df["key_qualifications"] = raw_disney_df["key_qualifications"].astype(str).str.lower()
+    # combine it all cause disney has no consistency across posts
+    raw_disney_df["all"] = raw_disney_df["basic_qualifications"] + raw_disney_df["preferred_qualifications"] + raw_disney_df["key_qualifications"] + raw_disney_df["education"] + raw_disney_df["preferred_education"]
+    raw_disney_df.drop(columns = [
         "basic_qualifications", "preferred_qualifications", "key_qualifications", "education", "preferred_education"
         ], inplace=True)
-    return disney_df
+    return raw_disney_df
 
 
-def find_keywords(disney_df):
+def split_up_dataframe(raw_disney_df, start_date):
     """ Check for keywords and throw away the rest """
-    disney_df = clean_up_dataframe(disney_df)
+    clean_disney_df = clean_up_dataframe(raw_disney_df)
     # use functions to get degree mentions or qualification keywords
-    disney_df["education_keywords"] = disney_df["all_education"].apply(match_education)
-    disney_df["qual_keywords"] = disney_df["all_qualifications"].apply(match_quals)
+    clean_disney_df["education_keywords"] = clean_disney_df["all"].apply(match_education)
+    clean_disney_df["qual_keywords"] = clean_disney_df["all"].apply(match_quals)
     # only grab necessary columns
-    disney_df = disney_df[["id", "title", "locations", "posting_date", "education_keywords", "qual_keywords"]]
-    return disney_df
+    clean_disney_df = clean_disney_df[["job_id", "title", "locations", "posting_date", "education_keywords", "qual_keywords"]]
+    """ Creates four different dataframes for: location, education, qualifications, and the raw tables """
+    # rename index for future 
+    clean_disney_df.index.name = "dim_id"
+    # create separate tables
+    dimension_table = clean_disney_df[["job_id", "title", "posting_date"]]
+    locations_table = clean_disney_df.drop(columns=["job_id", "title", "posting_date", "education_keywords", "qual_keywords"])
+    education_table = clean_disney_df.drop(columns=["job_id", "title", "posting_date", "locations", "qual_keywords"])
+    qualifications_table = clean_disney_df.drop(columns=["job_id", "title", "posting_date", "locations", "education_keywords"])
+    # rename dimension table id 
+    dimension_table.rename(columns = {"dim_id": "id"}, inplace=True)
+    # break our lists apart and give them back a real index
+    education_table = education_table.explode("education_keywords").reset_index()
+    qualifications_table = qualifications_table.explode("qual_keywords").reset_index() 
+    locations_table = locations_table.where(pd.notnull(locations_table), None) # turn NaNs into Nones
+    locations_table = locations_table.explode("locations").reset_index()
+    # locations has trailing and leading spaces
+    locations_table["locations"] = locations_table["locations"].str.strip()
+    
+    return [dimension_table, locations_table, education_table, qualifications_table]

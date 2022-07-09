@@ -106,12 +106,25 @@ def find_in_description(job:str, starting_str:str, ending_str:str):
             if ending_i == -1:
                 ending_i = job.find("About Disney Streaming:")
                 if ending_i == -1:
-                    return "NA"
+                    ending_i = job.find("Preferred Education")
+                    if ending_i == -1:
+                        ending_i = job.find("Preferred Skills")
+                        if ending_i == -1:
+                            ending_i = len(job) # sometimes the ats description field just ends with the education part
         # qualifications also has a few ways of ending across postings
         elif "Qualifications" in starting_str:
             ending_i = job.find("Additional Information:")
             if ending_i == -1:
-                 return "NA"
+                ending_i = job.find("Required Education")
+                if ending_i == -1:
+                    ending_i = len(job)
+        # and for responsibilities
+        elif "Responsibilities" in starting_str:
+            ending_i = job.find("Basic Qualifications")
+            if ending_i == -1:
+                ending_i = job.find("Required Education")
+                if ending_i == -1:
+                    return "NA"
         # give up/another edge case
         else:
             return "NA"
