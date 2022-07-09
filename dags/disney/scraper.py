@@ -15,8 +15,10 @@ Holds scripts that launch a browser, and wanders through the Disney search page 
 
 def launch_browser(url):
     options = webdriver.ChromeOptions()
+    # bug with chrome=103.0.5060.66, trying with beta
+    options.binary_location = "C:\\Program Files\\Google\\Chrome Beta\\Application\\chrome.exe"
     options.add_experimental_option("detach", True) # chromedriver closes without this option
-    driver = webdriver.Chrome(options= options, service=Service(ChromeDriverManager().install()))
+    driver = webdriver.Chrome(options= options, service=Service(ChromeDriverManager(version='104.0.5112.20').install()))
     driver.minimize_window()
     driver.get(url)
     return driver
@@ -102,7 +104,7 @@ def grab_job_data_from_multiple_links(paths):
         4. Creates a list of job description details per job 
         5. Creates a mapping of all job details to job id of posting"""
     post_descriptions_by_job_id = {}
-    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
+    driver = launch_browser("https://jobs.disneycareers.com")
     driver.minimize_window()
     urls = add_disney_url(paths)
     jobs_gotten_through = 1
@@ -115,19 +117,23 @@ def grab_job_data_from_multiple_links(paths):
         job_description = driver.find_elements(By.CLASS_NAME, value="ats-description")
         desc = split_and_clean(job_description)
         # filter out text that's actually needed
-        responsibilities = find_in_description(desc, "Responsibilities:", "Qualifications")
-        basic_qualifications = find_in_description(desc, "Basic Qualifications:", "Preferred Qualifications:")
-        preferred_qualifications = find_in_description(desc, "Preferred Qualifications:", "Required Education")
-        education = find_in_description(desc, "Required Education", "Additional Information:")
-        preferred_education = find_in_description(desc, "Preferred Education", "Additional Information:")
+        responsibilities = find_in_description(desc, "Responsibilities", "Qualifications")
+        basic_qualifications = find_in_description(desc, "Basic Qualifications", "Preferred Qualifications")
+        preferred_qualifications = find_in_description(desc, "Preferred Qualifications", "Required Education")
+        education = find_in_description(desc, "Required Education", "Additional Information")
+        preferred_education = find_in_description(desc, "Preferred Education", "Additional Information")
         key_qualifications = find_in_description(desc, "Key Qualifications", "Nice To Haves")
-        nice_to_haves = find_in_description(desc, "Nice To Haves", "Additional Information:")
+        nice_to_haves = find_in_description(desc, "Nice To Haves", "Additional Information")
+        what_to_do = find_in_description(desc, "WHAT YOU'LL DO", "WHAT TO BRING")
+        what_to_bring = find_in_description(desc, "WHAT TO BRING", "About")
+        experience = find_in_description(desc, "We're looking for candidates with experience in the following areas:", "To be considered for a Lead position on the team, you must demonstrate the following:")
+        lead_experience = find_in_description(desc, "To be considered for a Lead position on the team, you must demonstrate the following:", "Required Education")
         #and put it all together
         post_descriptions_by_job_id[job_id] = {
-            "responsibilities" : responsibilities,
-            "basic_qualifications" : basic_qualifications,
-            "preferred_qualifications" : preferred_qualifications,
-            "education" : education,
+            "responsibilities" : responsibilities + " " + what_to_do,
+            "basic_qualifications" : basic_qualifications + " " + experience,
+            "preferred_qualifications" : preferred_qualifications + " " + lead_experience,
+            "education" : education + " " + what_to_bring,
             "preferred_education" : preferred_education,
             "key_qualifications" : key_qualifications,
             "nice_to_haves" : nice_to_haves

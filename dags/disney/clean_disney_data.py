@@ -1,5 +1,6 @@
+########################## Standard Libraries #####################################
 import pandas as pd
-import ast
+import re
 ############################  FILTER DATAFRAME AT END #############################
 
 def create_csv(data, file_string="", date_pulled=""):
@@ -22,7 +23,7 @@ def create_csv(data, file_string="", date_pulled=""):
 
 
 job_qualifications = [
-    'Python', 'R ', 'AWS', ' Warehouse', 'Data Warehouse', 'Hive', 'Azure', 'Cloud', 'Java', 'C++', 'C ', 
+    'Python', '[,\/; \n]R[,\/; ]', 'AWS', ' Warehouse', 'Data Warehouse', 'Hive', 'Azure', 'Cloud', 'Java', 'C\+\+', '[,\/; \n]C[,\/; ]', 
     'Airflow', 'SQL', 'Database', 'Postgres', 'Machine Learning', 'Big Data', 'ETL', 'Kafka', 'Spark', 'Scala',
     'Terraform', 'Redshift', 'Pipeline', 'Hadoop', 'Docker', 'GitLab', 'GitHub', 'Kubernetes', 'HCI', 'Linux', 
     'OSX', 'svn', 'Gradle', 'Maven', 'Swift', 'Matlab', 'MongoDB', 'Objective-C', 'Ruby', 'Perl', 'Pig', 'Hadoop',
@@ -49,8 +50,13 @@ def match_education(row):
 def match_quals(row):
     qual_list = []
     for qual in job_qualifications:
-        if qual.lower() in str(row):
-            qual_list.append(qual)
+        # if qual.lower() in str(row):
+            # qual_list.append(qual)
+        try:
+            if len(re.match(qual.lower(), str(row)).group()) > 0:
+                qual_list.append(qual)
+        except AttributeError:
+            pass
     return qual_list
 
 

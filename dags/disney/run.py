@@ -2,6 +2,8 @@
 import pandas as pd
 from datetime import datetime as dt, timedelta
 import numpy as np
+import schedule
+import time
 ####################### My Libraries ###########################################
 from scraper import scrape_every_page
 from organize_job_details import map_job_details_with_qualifications
@@ -40,6 +42,18 @@ def main(start_date:str = "", pages:int = ""):
     for i in range(len(dfs)):  # create a csv file for each df
         create_csv(dfs[i], file_string = f"{table_names[i]}_", date_pulled=start_date)
     # upload_to_s3(clean_file_string)
+
+
+# def job():
+#     print("Running scraper now!")
+#     # change for start date and amount of pages wanted (defaults to yesterday and for all pages)
+#     main(pages=1)
+    
+# schedule.every().day.at("22:30").do(job)
+
+# while True:
+#     schedule.run_pending()
+#     time.sleep(1)
 
 if __name__ == "__main__":
     # change for start date and amount of pages wanted (defaults to yesterday and for all pages)
